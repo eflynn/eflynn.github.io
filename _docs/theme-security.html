@@ -1,0 +1,468 @@
+---
+title: Theme Security
+permalink: /theme-security/
+order: 6
+---
+<main class="site-main theme-handbook type-theme-handbook status-publish hentry type-handbook">
+
+<h1>Theme Security</h1>
+
+<div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#introduction">Introduction</a>
+<ul>
+<li><a href="#developing-a-security-mindset">Developing a Security Mindset</a></li>
+<li><a href="#additional-resources">Additional Resources</a></li></ul>
+</li></ul></div>
+<h2 class="toc-heading" id="introduction" tabindex="-1">Introduction <a href="#introduction" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Introduction</span></a></h2>
+<p>The WordPress development team takes security seriously. With so much of the web relying on the integrity of the platform, security is a necessity. While the core developers have a dedicated team focused on securing&nbsp;the core platform, as a theme developer you are quite aware that there is potentially much that is outside the core which can be vulnerable. Because WordPress provides so much power and flexibility, plugins and themes are key points of weakness.</p>
+<h3 class="toc-heading" id="developing-a-security-mindset" tabindex="-1">Developing a Security Mindset <a href="#developing-a-security-mindset" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Developing a Security Mindset</span></a></h3>
+<p>When developing your themes, it is important to consider security as you add functionality. Use the following principles as you begin your theme development efforts:</p>
+<ul>
+<li><strong>Don’t trust any data.</strong>&nbsp;Don’t trust user input, third-party APIs, or data in your database without verification. Protection of your WordPress themes begins with ensuring the data entering and leaving your theme is as intended.&nbsp;Always make sure to validate on input and sanitize (escape) data before use or on output.</li>
+<li><strong>Rely on the WordPress API.</strong>&nbsp;Many core WordPress functions provide the build in the functionality of validating and sanitizing data. Rely on the WordPress provided functions when possible.</li>
+<li><strong>Keep your themes up to date.</strong>&nbsp;As technology evolves, so does the potential for new security holes in your themes. Stay vigilant maintaining your code and updating your themes as required.</li>
+</ul>
+<p>This chapter provides some background on writing secure themes with <a href="https://developer.wordpress.org/themes/theme-security/data-validation/">data validation</a> and <a href="https://developer.wordpress.org/themes/theme-security/data-sanitizationescaping/">sanitization/escaping</a> techniques, <a href="https://developer.wordpress.org/themes/theme-security/using-nonces/">using nonces</a> to generate secure tokens, and a review of the <a href="https://developer.wordpress.org/themes/theme-security/common-vulnerabilities/">common security attacks</a>, and how you can&nbsp;harden your theme against them.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="additional-resources" tabindex="-1">Additional Resources <a href="#additional-resources" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Additional Resources</span></a></h3>
+<ul>
+<li>&nbsp; A Guide to Writing WordPress Themes – WordPress.org Blog Series
+<ul>
+<li><a href="https://make.wordpress.org/themes/2015/05/19/a-guide-to-writing-secure-themes-part-1-introduction/">A Guide to Writing Secure Themes – Part 1: Introduction</a></li>
+<li><a href="https://make.wordpress.org/themes/2015/05/26/a-guide-to-writing-secure-themes-part-2-validation/">A Guide to Writing Secure Themes – Part 2: Validation</a></li>
+<li><a href="https://make.wordpress.org/themes/2015/06/02/a-guide-to-writing-secure-themes-part-3-sanitization/">A Guide to Writing Secure Themes – Part 3: Sanitization</a></li>
+<li><a href="https://make.wordpress.org/themes/2015/06/09/a-guide-to-writing-secure-themes-part-4-securing-post-meta/">A Guide to Writing Secure Themes – Part 4: Securing Post Meta</a></li>
+</ul>
+</li>
+<li><a href="https://blog.sucuri.net/">Sucuri Security Blog</a></li>
+</ul>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/customize-api/advanced-usage/" rel="previous"><span class="meta-nav">←</span> Advanced Usage</a><a href="https://developer.wordpress.org/themes/theme-security/data-sanitization-escaping/" rel="next">Data Sanitization/Escaping <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main class="site-main post-24987 theme-handbook type-theme-handbook status-publish hentry type-handbook">
+
+		
+			
+<h1>Data Sanitization/Escaping</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#sanitization-securing-input">Sanitization: Securing Input</a>
+<ul>
+<li><a href="#example-simple-input-field">Example -Simple Input Field</a>
+</li></ul></li>
+<li><a href="#escaping-securing-output">Escaping: Securing Output</a>
+<ul>
+<li><a href="#escaping-with-localization">Escaping with Localization</a></li>
+<li><a href="#custom-escaping">Custom Escaping</a>
+</li></ul></li>
+<li><a href="#database-escaping">Database Escaping</a>
+<ul>
+<li><a href="#selecting-data">Selecting Data</a></li>
+<li><a href="#inserting-and-updating-data">Inserting and Updating Data</a></li>
+<li><a href="#like-statements">Like Statements</a></li></ul>
+</li></ul></div>
+<h2 class="toc-heading" id="sanitization-securing-input" tabindex="-1">Sanitization: Securing Input <a href="#sanitization-securing-input" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Sanitization: Securing Input</span></a></h2>
+<p>Sanitization is the process of cleaning or filtering your input data. Whether the data is from a user or an API or web service, you use sanitizing when you don’t know what to expect or you don’t want to be strict with <a href="https://developer.wordpress.org/themes/theme-security/data-validation/">data validation</a>.</p>
+<p>The easiest way to sanitize data is with built-in WordPress functions.</p>
+<p>The <code>sanitize_*()</code> series of helper functions provide an effective way to ensure you’re ending up with safe data, and they require minimal effort on your part:</p>
+<ul>
+<li><a href="https://developer.wordpress.org/reference/functions/sanitize_email/">sanitize_email()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/sanitize_file_name/">sanitize_file_name()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/sanitize_html_class/">sanitize_html_class()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/sanitize_key/">sanitize_key()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/sanitize_meta/">sanitize_meta()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/sanitize_mime_type/">sanitize_mime_type()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/sanitize_option/">sanitize_option()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/sanitize_sql_orderby/">sanitize_sql_orderby()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/sanitize_text_field/">sanitize_text_field()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/sanitize_title/">sanitize_title()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/sanitize_title_for_query/">sanitize_title_for_query()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/sanitize_title_with_dashes/">sanitize_title_with_dashes()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/sanitize_user/">sanitize_user()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/esc_url_raw/">esc_url_raw()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/wp_filter_post_kses/">wp_filter_post_kses()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/wp_filter_nohtml_kses/">wp_filter_nohtml_kses()</a></li>
+</ul>
+<div class="callout callout-tip"><p><span class="screen-reader-text">Tip:</span> <strong>Any time you’re accepting potentially unsafe data, it is important to validate or sanitize it.</strong></p>
+</div>
+<h3 class="toc-heading" id="example-simple-input-field" tabindex="-1">Example -Simple Input Field <a href="#example-simple-input-field" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Example -Simple Input Field</span></a></h3>
+<p>Let’s say we have an input field named title.</p>
+<pre class="brush: xml; title: ; notranslate" title="">&lt;input id="title" type="text" name="title"&gt;</pre>
+<p>You can sanitize the input data with the <a href="https://developer.wordpress.org/reference/functions/sanitize_text_field/">sanitize_text_field()</a> function:</p>
+<pre class="brush: php; title: ; notranslate" title="">$title = sanitize_text_field( $_POST['title'] );
+update_post_meta( $post-&gt;ID, 'title', $title );
+</pre>
+<p>Behind the scenes, <a href="https://developer.wordpress.org/reference/functions/sanitize_text_field/">sanitize_text_field()</a> does the following:</p>
+<ul>
+<li>Checks for invalid UTF-8</li>
+<li>Converts single less-than characters (&lt;) to entity</li>
+<li>Strips all tags</li>
+<li>Removes line breaks, tabs and extra white space</li>
+<li>Strips octets</li>
+</ul>
+<div class="callout callout-tip"><p><span class="screen-reader-text">Tip:</span> Remember, rely on the WordPress API and its help functions to assist with securing your themes.</p>
+</div>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="escaping-securing-output" tabindex="-1">Escaping: Securing Output <a href="#escaping-securing-output" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Escaping: Securing Output</span></a></h2>
+<p>Whenever you’re outputting data make sure to properly <strong>escape it</strong>.</p>
+<p><strong>Escaping is the process of securing output by stripping out unwanted data, like malformed HTML or script tags, preventing this data from being seen as code.</strong></p>
+<p>Escaping helps secure your data prior to rendering it for the end user and prevents XSS (Cross-site scripting) attacks.</p>
+<div class="callout callout-info"><p><span class="screen-reader-text">Note:</span> <br>
+<a href="https://en.wikipedia.org/wiki/Cross-site_scripting" target="_blank">Cross-site scripting (XSS)</a> is a type of computer security vulnerability typically found in web applications. XSS enables attackers to inject client-side scripts into web pages viewed by other users. A cross-site scripting vulnerability may be used by attackers to bypass access controls such as the same-origin policy.</p>
+</div>
+<p>WordPress has a few helper functions you can use for most common scenarios.</p>
+<ul>
+<li><a href="https://developer.wordpress.org/reference/functions/esc_html/">esc_html()</a> – Use this function anytime an HTML element encloses a section of data being displayed.</li>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php echo esc_html( $title ); ?&gt;</pre>
+<li><a href="https://developer.wordpress.org/reference/functions/esc_url/">esc_url()</a> – Use this function on all URLs, including those in the <code>src</code> and <code>href</code> attributes of an HTML element.</li>
+<pre class="brush: php; title: ; notranslate" title="">&lt;img src="&lt;?php echo esc_url( $great_user_picture_url ); ?&gt;" /&gt;</pre>
+<li><a href="https://developer.wordpress.org/reference/functions/esc_js/">esc_js()</a> – Use this function for inline Javascript.</li>
+<pre class="brush: php; title: ; notranslate" title="">&lt;a href="#" onclick="&lt;?php echo esc_js( $custom_js ); ?&gt;"&gt;Click me&lt;/a&gt;</pre>
+<li><a href="https://developer.wordpress.org/reference/functions/esc_attr/">esc_attr()</a> – Use this function on everything else that’s printed into an HTML element’s attribute.</li>
+<pre class="brush: php; title: ; notranslate" title="">&lt;ul class="&lt;?php echo esc_attr( $stored_class ); ?&gt;"&gt; &lt;/ul&gt;</pre>
+<li><a href="https://developer.wordpress.org/reference/functions/esc_textarea/">esc_textarea()</a> – encodes text for use inside a textarea element.</li>
+<pre class="brush: php; title: ; notranslate" title="">&lt;textarea&gt;&lt;?php echo esc_textarea( $text ); ?&gt;&lt;/textarea&gt;</pre>
+</ul>
+<div class="callout callout-tip"><p><span class="screen-reader-text">Tip:</span> Output escaping should occur as late as possible.</p>
+</div>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="escaping-with-localization" tabindex="-1">Escaping with Localization <a href="#escaping-with-localization" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Escaping with Localization</span></a></h3>
+<p>Rather than using <code>echo</code> to output data, it’s common to use the WordPress localization functions, such as <a href="https://developer.wordpress.org/reference/functions/_e/">_e()</a> or <a href="https://developer.wordpress.org/reference/functions/__/">__()</a>.</p>
+<p>These functions simply wrap a localization function inside an escaping function:</p>
+<pre class="brush: php; title: ; notranslate" title="">esc_html_e( 'Hello World', 'text_domain' );
+// same as
+echo esc_html( __( 'Hello World', 'text_domain' ) );
+</pre>
+<p>These helper functions combine localization and escaping:</p>
+<ul>
+<ul>
+<ul>
+<li><a href="https://developer.wordpress.org/reference/functions/esc_html__/">esc_html__()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/esc_html_e/">esc_html_e()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/esc_html_x/">esc_html_x()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/esc_attr__/">esc_attr__()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/esc_attr_e/">esc_attr_e()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/esc_attr_x/">esc_attr_x()</a></li>
+</ul>
+</ul>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="custom-escaping" tabindex="-1">Custom Escaping <a href="#custom-escaping" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Custom Escaping</span></a></h3>
+<p>In the case that you need to escape your output in a specific way, the function <a href="https://developer.wordpress.org/reference/functions/wp_kses/">wp_kses()</a> (pronounced “kisses”) will come in handy. For example, there are instances when your want HTML elements or attributes to display in your output.</p>
+<p>This function makes sure that only the specified HTML elements, attributes, and attribute values will occur in your output, and normalizes HTML entities.</p>
+<pre class="brush: php; title: ; notranslate" title="">$allowed_html = [
+    'a'      =&gt; [
+        'href'  =&gt; [],
+        'title' =&gt; [],
+    ],
+    'br'     =&gt; [],
+    'em'     =&gt; [],
+    'strong' =&gt; [],
+];
+echo wp_kses( $custom_content, $allowed_html );
+</pre>
+<p><a href="https://developer.wordpress.org/reference/functions/wp_kses_post/">wp_kses_post()</a> is a wrapper function for wp_kses where <code>$allowed_html</code> is a set of rules used by post content.</p>
+<pre class="brush: php; title: ; notranslate" title="">echo wp_kses_post( $post_content );
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="database-escaping" tabindex="-1">Database Escaping <a href="#database-escaping" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Database Escaping</span></a></h2>
+<p>All data in SQL queries must be SQL-escaped before the SQL query is executed to prevent against <a href="https://developer.wordpress.org/themes/theme-security/common-vulnerabilities/">SQL injection attacks</a>. WordPress provides helper classes to assist with escaping SQL queries <code>$wpdb</code>.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="selecting-data" tabindex="-1">Selecting Data <a href="#selecting-data" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Selecting Data</span></a></h3>
+<p>The escaped SQL query ($sql in this example) can then be used with one of the methods:</p>
+<ul>
+<ul>
+<ul>
+<li><a href="https://developer.wordpress.org/reference/classes/wpdb/get_row/">$</a><a href="https://developer.wordpress.org/reference/classes/wpdb/">wpdb</a>-&gt;get_row($sql)</li>
+<li><a href="https://developer.wordpress.org/reference/classes/wpdb/get_var/">$</a><a href="https://developer.wordpress.org/reference/classes/wpdb/">wpdb</a>-&gt;get_var($sql)</li>
+<li><a href="https://developer.wordpress.org/reference/classes/wpdb/get_results/">$</a><a href="https://developer.wordpress.org/reference/classes/wpdb/">wpdb</a>-&gt;get_results($sql)</li>
+<li><a href="https://developer.wordpress.org/reference/classes/wpdb/get_col/">$</a><a href="https://developer.wordpress.org/reference/classes/wpdb/">wpdb</a>-&gt;get_col($sql)</li>
+<li><a href="https://developer.wordpress.org/reference/classes/wpdb/query/">$</a><a href="https://developer.wordpress.org/reference/classes/wpdb/">wpdb</a>-&gt;query($sql)</li>
+</ul>
+</ul>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="inserting-and-updating-data" tabindex="-1">Inserting and Updating Data <a href="#inserting-and-updating-data" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Inserting and Updating Data</span></a></h3>
+<ul>
+<ul>
+<ul>
+<li><a href="https://developer.wordpress.org/reference/classes/wpdb/update/">$</a><a href="https://developer.wordpress.org/reference/classes/wpdb/">wpdb</a>-&gt;update()</li>
+<li><a href="https://developer.wordpress.org/reference/classes/wpdb/insert/">$</a><a href="https://developer.wordpress.org/reference/classes/wpdb/">wpdb</a>-&gt;insert()</li>
+</ul>
+</ul>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="like-statements" tabindex="-1">Like Statements <a href="#like-statements" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Like Statements</span></a></h3>
+<ul>
+<ul>
+<li><a href="https://developer.wordpress.org/reference/classes/wpdb/prepare/">$</a><a href="https://developer.wordpress.org/reference/classes/wpdb/">wpdb</a>-&gt;prepare</li>
+</ul>
+</ul>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/theme-security/" rel="previous"><span class="meta-nav">←</span> Theme Security</a><a href="https://developer.wordpress.org/themes/theme-security/data-validation/" rel="next">Data Validation <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main class="site-main post-24985 theme-handbook type-theme-handbook status-publish hentry type-handbook">
+
+		
+			
+<h1>Data Validation</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#validating-the-data">Validating the Data</a>
+<ul>
+<li><a href="#built-in-php-functions">Built-in PHP functions</a></li>
+<li><a href="#core-wordpress-functions">Core WordPress functions</a></li>
+<li><a href="#custom-php-and-javascript-functions">Custom PHP and JavaScript functions</a>
+</li></ul></li>
+<li><a href="#example-1">Example 1</a></li>
+<li><a href="#example-2">Example 2</a></li></ul>
+</div>
+<p>Data validation is the process of analyzing the data against a predefined pattern (or patterns) with a definitive result: valid or invalid.</p>
+<p>Usually this applies to data coming from external sources such as user input and calls to web services via API.</p>
+<p>Simple examples of data validation:</p>
+<ul>
+<li>Check that required fields have not been left blank</li>
+<li>Check that an entered phone number only contains numbers and punctuation</li>
+<li>Check that an entered postal code is a valid postal code</li>
+<li>Check that a quantity field is greater than 0</li>
+</ul>
+<p><strong>Data validation should be performed as early as possible.</strong> That means validating the data before performing any actions.</p>
+<div class="callout callout-info"><p><span class="screen-reader-text">Note:</span> <br>
+Validation can be performed by using JavaScript on the front end and by using PHP on the back end.</p>
+</div>
+<h2 class="toc-heading" id="validating-the-data" tabindex="-1">Validating the Data <a href="#validating-the-data" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Validating the Data</span></a></h2>
+<p>There are at least three ways: built-in PHP functions, core WordPress functions, and custom functions you write.</p>
+<h3 class="toc-heading" id="built-in-php-functions" tabindex="-1">Built-in PHP functions <a href="#built-in-php-functions" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Built-in PHP functions</span></a></h3>
+<p>Basic validation is doable using many built-in PHP functions, including these:</p>
+<ul>
+<li><code><a href="//secure.php.net/isset">isset()</a></code> and <code><a href="//secure.php.net/empty">empty()</a></code> for checking whether a variable exists and isn’t blank</li>
+<li><code><a href="//secure.php.net/mb_strlen">mb_strlen()</a></code> or <code><a href="//secure.php.net/strlen">strlen()</a></code> for checking that a string has the expected number of characters</li>
+<li><code><a href="//secure.php.net/preg_match">preg_match()</a></code>, <code><a href="//secure.php.net/strpos">strpos()</a></code> for checking for occurrences of certain strings in other strings</li>
+<li><code><a href="//secure.php.net/count">count()</a></code> for checking how many items are in an array</li>
+<li><code><a href="//secure.php.net/in_array">in_array()</a></code> for checking whether something exists in an array</li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="core-wordpress-functions" tabindex="-1">Core WordPress functions <a href="#core-wordpress-functions" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Core WordPress functions</span></a></h3>
+<p>WordPress provides many useful functions that help validate different kinds of data. Here are several examples:</p>
+<ul>
+<li><code><a href="/reference/functions/is_email/">is_email()</a></code> will validate whether an email address is valid.</li>
+<li><code><a href="/reference/functions/term_exists/">term_exists()</a></code> checks whether a tag, category, or other taxonomy term exists.</li>
+<li><code><a href="/reference/functions/username_exists/">username_exists()</a></code> checks if username exists.</li>
+<li><code><a href="/reference/functions/validate_file/">validate_file()</a></code> will validate that an entered file path is a real path (but not whether the file exists).</li>
+</ul>
+<p>Check the the list of <a href="https://developer.wordpress.org/themes/references/list-of-conditional-tags/">conditional tags</a> for more functions like these.<br>
+Search for functions with names like these: <code>*_exists()</code>, <code>*_validate()</code>, and&nbsp;<code>is_*()</code>. Not all of these are validation functions, but many are helpful.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="custom-php-and-javascript-functions" tabindex="-1">Custom PHP and JavaScript functions <a href="#custom-php-and-javascript-functions" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Custom PHP and JavaScript functions</span></a></h3>
+<p>You can write your own PHP and JavaScript functions and include them in your plugin.&nbsp;When writing a validation function, you’ll want to name&nbsp;it like a question (examples:&nbsp;is_phone, is_available, is_us_zipcode).</p>
+<p>The function should return a boolean, either true or false, depending on whether the data is valid or not. This will allow using the function as a condition.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="example-1" tabindex="-1">Example 1 <a href="#example-1" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Example 1</span></a></h2>
+<p>Let’s say you have an U.S. zip code input field that a user submits.</p>
+<pre class="brush: xml; title: ; notranslate" title="">&lt;input id="wporg_zip_code" type="text" maxlength="10" name="wporg_zip_code"&gt;</pre>
+<p>The text field allows up to 10 characters of input with no limitations on the types of characters that can be used. Users could enter something valid like <code>1234567890</code> or something invalid (and evil) like <code>eval()</code>.</p>
+<p>The <code>maxlength</code> attribute on our <code>input</code> field is only enforced by the browser, so you still need to validate the length of the input on the server. If you don’t, an attacker could alter the maxlength value.</p>
+<p>By using validation we can ensure we’re accepting only valid zip codes.</p>
+<p>First you need to write a function to validate a U.S. zip codes:</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php function is_us_zip_code($zip_code) { // scenario 1: empty if (empty($zip_code)) { return false; } // scenario 2: more than 10 characters if (strlen(trim($zip_code)) &gt; 10) {
+        return false;
+    }
+
+    // scenario 3: incorrect format
+    if (!preg_match('/^\d{5}(\-?\d{4})?$/', $zip_code)) {
+        return false;
+    }
+
+    // passed successfully
+    return true;
+}
+</pre>
+<p>When processing the form, your code should check the <code>wporg_zip_code</code> field and perform the action based on the result:</p>
+<pre class="brush: php; title: ; notranslate" title="">if ( isset( $_POST['wporg_zip_code'] ) &amp;&amp; is_us_zip_code( $_POST['wporg_zip_code'] ) ) {
+    // your action
+}
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="example-2" tabindex="-1">Example 2 <a href="#example-2" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Example 2</span></a></h2>
+<p>Say you’re going to query the database for some posts, and you want to give the user the ability to sort the query results.</p>
+<p>This example code checks an incoming sort key (stored in the “orderby”&nbsp;input parameter) for validity by comparing it against an array of allowed sort keys using the built-in PHP function&nbsp;<a href="//secure.php.net/in_array"><code>in_array</code></a>. This prevents the user from passing in malicious data and potentially compromising the website.</p>
+<p>Before checking the incoming sort key against the array, the key&nbsp;is passed into the built-in WordPress function&nbsp;<a href="https://codex.wordpress.org/Function_Reference/sanitize_key"><code>sanitize_key</code></a>. This function ensures, among other things, that the key is in lowercase (<a href="//secure.php.net/in_array"><code>in_array</code></a> performs a <em>case-sensitive</em> search).</p>
+<p>Passing “true” into the third parameter of&nbsp;<a href="//php.net/in_array"><code>in_array</code></a> enables strict type checking, which tells the function to not only compare values but value&nbsp;<em><a href="http://php.net/manual/en/language.types.php">types</a></em>&nbsp;as well. This allows the code to be certain that the incoming sort key is a string and not some other data type.</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php
+$allowed_keys = ['author', 'post_author', 'date', 'post_date'];
+
+$orderby = sanitize_key( $_POST['orderby'] );
+
+if ( in_array( $orderby, $allowed_keys, true ) ) {
+    // modify the query to sort by the orderby key
+}
+</pre>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/theme-security/data-sanitization-escaping/" rel="previous"><span class="meta-nav">←</span> Data Sanitization/Escaping</a><a href="https://developer.wordpress.org/themes/theme-security/using-nonces/" rel="next">Using Nonces <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main class="site-main post-24989 theme-handbook type-theme-handbook status-publish hentry type-handbook">
+
+		
+			
+<h1>Using Nonces</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#creating-a-nonce">Creating a Nonce</a></li>
+<li><a href="#verifying-a-nonce">Verifying a Nonce</a></li>
+<li><a href="#example">Example</a></li></ul>
+</div>
+<p>WordPress nonces are one-time use security tokens generated by WordPress to help protect URLs and forms from misuse.</p>
+<p>If your theme allows users to submit data; be it in the Admin or the front-end; nonces can be used to <strong>verify a&nbsp;user intends to perform an action</strong>, and&nbsp;is instrumental in protecting against <a href="https://developer.wordpress.org/themes/theme-security/common-vulnerabilities/#cross-site-request-forgery-csrf">Cross-Site Request Forgery(CSRF)</a>.</p>
+<p>An example is a WordPress site in which authorized users are allowed to upload videos. As an authorized user uploading videos is an intentional action and permitted. However, in a CSRF, a hacker can hijack (forge) the use of an authorized user and perform a fraudulent submission.</p>
+<p>The one-time use hash generated by a nonce, prevents this type of forged attacks from being successful by validating the upload request is done by the current logged in user. Nonces are unique only to the current user’s session, so if an attempt is made to log in or out any nonces on the page become invalid.</p>
+<h2 class="toc-heading" id="creating-a-nonce" tabindex="-1">Creating a Nonce <a href="#creating-a-nonce" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Creating a Nonce</span></a></h2>
+<ul>
+<li><a href="https://developer.wordpress.org/reference/functions/wp_nonce_url/">wp_nonce_url()</a>&nbsp;– Adding a nonce to an URL.</li>
+<li><a href="https://developer.wordpress.org/reference/functions/wp_nonce_field/">wp_nonce_field()</a>&nbsp;– Adding a nonce to a form.</li>
+<li><a href="https://developer.wordpress.org/reference/functions/wp_create_nonce/">wp_create_nonce()</a>&nbsp;– Using a nonce in a custom way; useful for processing&nbsp;AJAX requests.</li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="verifying-a-nonce" tabindex="-1">Verifying a Nonce <a href="#verifying-a-nonce" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Verifying a Nonce</span></a></h2>
+<ul>
+<li><a href="https://developer.wordpress.org/reference/functions/check_admin_referer/">check_admin_referer()</a>&nbsp;–&nbsp;To verify a nonce that was passed in a URL or a form in an admin screen.</li>
+<li><a href="https://developer.wordpress.org/reference/functions/check_ajax_referer/">check_ajax_referer()</a>&nbsp;– Checks the nonce (but not the referrer), and if the check fails then by default it terminates script execution.</li>
+<li><a href="https://developer.wordpress.org/reference/functions/wp_verify_nonce/">wp_verify_nonce()</a>&nbsp;–&nbsp;To verify a nonce passed in some other context.</li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="example" tabindex="-1">Example <a href="#example" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Example</span></a></h2>
+<p>In this example, we have a basic submission form.</p>
+<p><strong>Create the Nonce</strong></p>
+<p>To secure your form with a nonce, create a hidden nonce field using <a href="https://developer.wordpress.org/reference/functions/wp_nonce_field/">wp_nonce_field()</a> function:</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;form method="post"&gt;
+   &lt;!-- some inputs here ... --&gt;
+   &lt;?php wp_nonce_field( 'name_of_my_action', 'name_of_nonce_field' ); ?&gt;
+&lt;/form&gt;
+</pre>
+<p><strong>Verify the Nonce</strong></p>
+<p>In our example we first check if the nonce field is set since we do not want to run anything if the form has not been submitted. If the form has been submitted we use the nonce field value function. If nonce verification is successful the form will process.</p>
+<pre class="brush: php; title: ; notranslate" title="">if ( 
+    ! isset( $_POST['name_of_nonce_field'] ) 
+    || ! wp_verify_nonce( $_POST['name_of_nonce_field'], 'name_of_my_action' ) 
+) {
+
+   print 'Sorry, your nonce did not verify.';
+   exit;
+
+} else {
+
+   // process form data
+}
+</pre>
+<p>In this example the basic nonce process:</p>
+<ol>
+<li>Generates a nonce with the <a href="https://developer.wordpress.org/reference/functions/wp_nonce_field/">wp_nonce_field()</a> function.</li>
+<li>The nonce is submitted with the form submission.</li>
+<li>The nonce is verified for validity using the <a href="https://developer.wordpress.org/reference/functions/wp_verify_nonce/">wp_verify_nonce()</a> function. If not verified the request exits with an error message.</li>
+</ol>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/theme-security/data-validation/" rel="previous"><span class="meta-nav">←</span> Data Validation</a><a href="https://developer.wordpress.org/themes/theme-security/common-vulnerabilities/" rel="next">Common Vulnerabilities <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+
+</main>
+<main class="site-main post-25102 theme-handbook type-theme-handbook status-publish hentry type-handbook">
+
+<h1>Common Vulnerabilities</h1>
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#types-of-vulnerabilities">Types of Vulnerabilities</a>
+<ul>
+<li><a href="#sql%c2%a0injection">SQL&nbsp;Injection</a></li>
+<li><a href="#cross-site-scripting-xss">Cross Site Scripting (XSS)</a></li>
+<li><a href="#cross-site-request-forgery-csrf">Cross-site Request Forgery (CSRF)</a></li>
+<li><a href="#staying-current">Staying Current</a></li></ul>
+</li></ul></div>
+<p>Security is an ever-changing landscape, and vulnerabilities evolve over time. The following is a discussion of common vulnerabilities you should protect against, and the techniques for protecting your theme from exploitation.</p>
+<h2 class="toc-heading" id="types-of-vulnerabilities" tabindex="-1">Types of Vulnerabilities <a href="#types-of-vulnerabilities" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Types of Vulnerabilities</span></a></h2>
+<h3 class="toc-heading" id="sql%c2%a0injection" tabindex="-1">SQL&nbsp;Injection <a href="#sql%c2%a0injection" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">SQL&nbsp;Injection</span></a></h3>
+<p><strong> What it is:</strong><br>
+SQL&nbsp;injection happens when values being inputted are not properly sanitized allowing for any SQL&nbsp;commands in the inputted data to potentially be executed. To prevent this, the WordPress API is extensive, offering functions like&nbsp;<code>add_post_meta();&nbsp;</code>instead of you needing to adding the post meta manually via SQL&nbsp;(<code>INSERT INTO wp_postmeta…</code>).</p>
+<p><img class="aligncenter size-full wp-image-4237" src="https://make.wordpress.org/docs/files/2013/03/exploits_of_a_mom.png" alt="exploits_of_a_mom" width="666" height="205"></p>
+<p style="text-align: right"><small>xkcd <a href="https://xkcd.com/327/">Exploits of a Mom</a></small></p>
+<p>The first rule for hardening your theme against SQL&nbsp;injection is: When there’s a WordPress function, use it.</p>
+<p>But sometimes you need to do complex queries, that have not been accounted for in the API. If this is the case, always use the&nbsp;<a href="https://developer.wordpress.org/reference/classes/wpdb/"><code>$wpdb&nbsp;</code>functions</a>. These were built specifically to protect your database.</p>
+<p>All data in SQL queries must be SQL-escaped before the SQL query is executed to prevent against SQL injection attacks. The best function to use for SQL-escaping is <code>$wpdb-&gt;prepare()&nbsp;</code>which supports both a <a href="http://secure.php.net/sprintf" target="_blank">sprintf()</a>-like and <a href="http://secure.php.net/vsprintf" target="_blank">vsprintf()</a>-like syntax.</p>
+<pre class="brush: php; title: ; notranslate" title="">$wpdb-&gt;get_var( $wpdb-&gt;prepare(
+  "SELECT something FROM table WHERE foo = %s and status = %d",
+  $name, // an unescaped string (function will do the sanitization for you)
+  $status // an untrusted integer (function will do the sanitization for you)
+) );
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="cross-site-scripting-xss" tabindex="-1">Cross Site Scripting (XSS) <a href="#cross-site-scripting-xss" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Cross Site Scripting (XSS)</span></a></h3>
+<p>Cross Site Scripting (XSS) happens when a nefarious party injects JavaScript into a web&nbsp;page.</p>
+<p>Avoid XSS vulnerabilities&nbsp;by escaping output, stripping out unwanted data. As a theme’s primary responsibility is outputting content, a theme should&nbsp;<a href="https://developer.wordpress.org/themes/theme-security/data-sanitization-escaping/">escape dynamic content</a> with the&nbsp;proper&nbsp;function depending on the type of the&nbsp;content.</p>
+<p>An example of one of the escaping functions is escaping URL from a user profile.</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;img src="&lt;?php echo esc_url( $great_user_picture_url ); ?&gt;" /&gt;
+</pre>
+<p>Content that has HTML entities within can be sanitized to allow only specified HTML elements.</p>
+<pre class="brush: php; title: ; notranslate" title="">$allowed_html = array(
+    'a' =&gt; array(
+        'href' =&gt; array(),
+        'title' =&gt; array()
+    ),
+    'br' =&gt; array(),
+    'em' =&gt; array(),
+    'strong' =&gt; array(),
+);
+ 
+echo wp_kses( $custom_content, $allowed_html );
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="cross-site-request-forgery-csrf" tabindex="-1">Cross-site Request Forgery (CSRF) <a href="#cross-site-request-forgery-csrf" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Cross-site Request Forgery (CSRF)</span></a></h3>
+<p>Cross-site request forgery&nbsp;or CSRF (pronounced sea-surf) is when a nefarious party tricks a user into&nbsp;performing an unwanted action within a web application they are authenticated in. For example, a phishing email might contain a link&nbsp;to a page that would&nbsp;delete a user’s account in the WordPress admin.</p>
+<p>If your theme includes any HTML or HTTP-based form submissions, use a&nbsp;<a href="https://developer.wordpress.org/themes/theme-security/using-nonces/">nonce</a>&nbsp;to guarantee a user intends to perform an action.</p>
+<pre class="brush: php; title: ; notranslate" title="">
+&lt;form method="post"&gt;
+   &lt;!-- some inputs here ... --&gt;
+   &lt;?php wp_nonce_field( 'name_of_my_action', 'name_of_nonce_field' ); ?&gt;
+&lt;/form&gt;
+
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="staying-current" tabindex="-1">Staying Current <a href="#staying-current" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Staying Current</span></a></h3>
+<p>It is important to stay current on potential security holes. The following resources provide a good starting point:</p>
+<ul>
+<li><a href="https://wordpress.org/about/security/">WordPress Security Whitepaper</a></li>
+<li><a href="https://wordpress.org/news/category/security/">WordPress Security Release</a></li>
+<li><a href="https://www.owasp.org/index.php/OWASP_Top_Ten_Cheat_Sheet">Open Web Application Security Project (OWASP) Top 10</a></li>
+</ul>
+<p>&nbsp;</p>
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+</main>

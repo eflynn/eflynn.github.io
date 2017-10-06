@@ -1,0 +1,1246 @@
+---
+title: Template Files Section
+permalink: /template-files-section/
+order: 3
+---
+
+<main id="main" class="site-main theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+<h1>Template Files Section</h1>
+
+<p>We introduced <a href="https://developer.wordpress.org/themes/basics/template-files/">template files</a> earlier in the handbook. &nbsp;This next section is going to break up the different template files through the <a href="https://developer.wordpress.org/themes/basics/post-types/">post types</a> that they display and provide a&nbsp;more in depth explanation of the purpose for these template files. &nbsp;You’ll also get a handle on some practical use cases for the different template files.</p>
+<p>You’ll start with <a href="https://developer.wordpress.org/themes/template-files-section/post-template-files/">post template files</a> that deal with displaying the Post post type. &nbsp;Then you’ll look at <a href="https://developer.wordpress.org/themes/template-files-section/page-template-files/">page template files</a> that display the Page post type and drill down into <a href="https://developer.wordpress.org/themes/template-files-section/page-template-files/page-templates/">specific page templates</a> that WordPress has built in to its functionality. &nbsp;Next you’ll learn about <a href="https://developer.wordpress.org/themes/template-files-section/attachment-template-files/">attachment template files</a> which display the attachment post type. &nbsp;You’ll also learn about how to display custom post types that are built by a plugin in the <a href="https://developer.wordpress.org/themes/template-files-section/custom-post-type-template-files/">custom post type templates</a>. &nbsp;Lastly, you’ll touch on some <a href="https://developer.wordpress.org/themes/template-files-section/partial-and-miscellaneous-template-files/">partial and miscellaneous template files</a> which are important to include but don’t necessarily display post types.</p>
+<div class="callout callout-info"><p><span class="screen-reader-text">Note:</span> &nbsp;It’s important to understand WordPress doesn’t really break down template files down into specific types of template files such as post template files or attachment template files. Especially since many template files, such as <code>index.php</code> or&nbsp;<code>search.php</code> can display many different post types.&nbsp;To help you reference specific template files this handbook is categorizing them based on the post types they can display.</p>
+</div>
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+</main>
+    
+<main id="main" class="site-main post-17399 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+		
+<h1>Post Template Files</h1>
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#index-php">Index.php</a></li>
+<li><a href="#home-php">Home.php</a></li>
+<li><a href="#single-php">Single.php</a></li>
+<li><a href="#singular-php">Singular.php</a></li>
+<li><a href="#archive-php">Archive.php</a></li>
+<li><a href="#author-php-and-date-php">Author.php and Date.php</a>
+<ul>
+<li><a href="#author-php">Author.php</a></li>
+<li><a href="#date-php">Date.php</a>
+</li></ul></li>
+<li><a href="#category-php-tag-php-and-taxonomy-php">Category.php, Tag.php, and Taxonomy.php</a></li>
+<li><a href="#search-php">Search.php</a></li></ul>
+</div>
+<p>There are many <a href="https://developer.wordpress.org/themes/basics/template-files/">template files</a> that WordPress uses to display the Post <a href="https://developer.wordpress.org/themes/basics/post-types/">post type</a>.  Any content dealing with a blog or its posts are within the Post post type.</p>
+<h2 class="toc-heading" id="index-php" tabindex="-1">Index.php <a href="#index-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Index.php</span></a></h2>
+<p><code>index.php</code> will display Post post types if there is no other template file in place. As stated in many places, every theme must have an <code>index.php</code> file to be valid. Many basic themes can get away with just using the <code>index.php</code> to display their Post post types, but the use cases given above would justify creating other template files.</p>
+<p>Often you will want unique content structure or layout depending on what is being displayed. There are many templates you can use to customize content structure based on the context within the site. The two most notable post template files are <code>home.php</code> and <code>single.php</code> which display a feed of posts and a single post respectively.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="home-php" tabindex="-1">Home.php <a href="#home-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Home.php</span></a></h2>
+<p>When a static front page is used and the site has a page defined for the blog list the <code>home.php</code> file is used for the designated blog list page. Use of this template is encouraged over creating a custom page template because blog pagination on a custom page template will not work properly. If there is no <code>home.php</code> in the theme <code>index.php</code> will be used instead.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="single-php" tabindex="-1">Single.php <a href="#single-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Single.php</span></a></h2>
+<p>It’s good sense to build as simply as possible in your template structure and not make more templates unless you have real need for them.  Therefore, most theme developers don’t create a single-post.php file because single.php is specific enough.  For the most part, all themes should have a <code>single.php</code>.  Below is an example of a <code>single.php</code> file from the theme Twenty Fifteen.</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php
+/**
+ * The template for displaying all single posts and attachments
+ *
+ * @package WordPress
+ * @subpackage Twenty_Fifteen
+ * @since Twenty Fifteen 1.0
+ */
+
+get_header(); ?&gt;
+
+	&lt;div id="primary" class="content-area"&gt;
+		&lt;main id="main" class="site-main" role="main"&gt;
+
+		&lt;?php
+		// Start the loop.
+		while ( have_posts() ) : the_post();
+
+			/*
+			 * Include the post format-specific template for the content. If you want to
+			 * use this in a child theme, then include a file called called content-___.php
+			 * (where ___ is the post format) and that will be used instead.
+			 */
+			get_template_part( 'content', get_post_format() );
+
+			// If comments are open or we have at least one comment, load up the comment template.
+			if ( comments_open() || get_comments_number() ) :
+				comments_template();
+			endif;
+
+			// Previous/next post navigation.
+			the_post_navigation( array(
+				'next_text' =&gt; '&lt;span class="meta-nav" aria-hidden="true"&gt;' . __( 'Next', 'twentyfifteen' ) . '&lt;/span&gt; ' .
+					'&lt;span class="screen-reader-text"&gt;' . __( 'Next post:', 'twentyfifteen' ) . '&lt;/span&gt; ' .
+					'&lt;span class="post-title"&gt;%title&lt;/span&gt;',
+				'prev_text' =&gt; '&lt;span class="meta-nav" aria-hidden="true"&gt;' . __( 'Previous', 'twentyfifteen' ) . '&lt;/span&gt; ' .
+					'&lt;span class="screen-reader-text"&gt;' . __( 'Previous post:', 'twentyfifteen' ) . '&lt;/span&gt; ' .
+					'&lt;span class="post-title"&gt;%title&lt;/span&gt;',
+			) );
+
+		// End the loop.
+		endwhile;
+		?&gt;
+
+		&lt;/main&gt;&lt;!-- .site-main --&gt;
+	&lt;/div&gt;&lt;!-- .content-area --&gt;
+
+&lt;?php get_footer(); ?&gt;
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p>In the code example above you can see the header is pulled in with <code><a href="https://developer.wordpress.org/reference/functions/get_header/">get_header()</a></code> then there are a two html tags.  Next <a href="https://developer.wordpress.org/themes/basics/the-loop/">the Loop</a> starts and the <a href="https://developer.wordpress.org/themes/basics/template-tags/">template tag</a> <code class="php plain"><a href="https://developer.wordpress.org/reference/functions/get_template_part/">get_template_part</a>( </code><code class="php string">'content'</code><code class="php plain">, get_post_format());</code> pulls in the appropriate content by determining the post type with <code><a href="https://developer.wordpress.org/reference/functions/get_post_format/">get_post_format()</a></code>. Next, <a href="https://developer.wordpress.org/themes/functionality/comments/">comments</a> are pulled in with the template tag <a href="https://developer.wordpress.org/reference/functions/comments_template/">comments_template()</a>. Then there is some <a href="https://developer.wordpress.org/themes/functionality/pagination/">pagination</a>.  Lastly, the content divs are closed and then footer is pulled in with <code><a href="https://developer.wordpress.org/reference/functions/get_footer/">get_footer()</a></code>.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="singular-php" tabindex="-1">Singular.php <a href="#singular-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Singular.php</span></a></h2>
+<p>WordPress Version 4.3 added <code>singular.php</code> that comes in the hierarchy after <code>single.php</code> for posts, <code>page.php</code> for pages, and the variations of each. This template follows the rules of <a href="https://developer.wordpress.org/reference/functions/is_singular/">is_singular()</a> and is used for a single post, regardless of post type. Themes that used the same code for both of those files (or included one in the other) can now simplify down to the one template.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="archive-php" tabindex="-1">Archive.php <a href="#archive-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Archive.php</span></a></h2>
+<p>Unless a developer includes meta data with permalinks in their templates, the <code>archive.php</code> will not be used.  Meta data is information tied to the post.  For example the date something was posted on, the author, and any <a href="https://developer.wordpress.org/themes/functionality/categories-tags-custom-taxonomies/">categories, tags, or taxonomies</a> used for the post are all examples of meta data.  When a visitor to a website clicks on the meta data, the <code>archive.php</code> will render any posts associated with that piece of meta data.  For example, if a visitor clicks on the name of an author, the <code>archive.php</code> will display all posts by that author.</p>
+<p>Commonly, the title of the page being displayed by <code>archive.php</code> will be the name of the meta data the user clicked on.  So if the user clicked on the Author’s name, the page name displaying all the other author’s posts will be the Author’s name and frequently there might be an additional description about the meta data.   Here is a code example from Twenty Fifteen on their <code>achive.php</code> file.  This snippet is the only piece of code that makes the <code>archive.php</code> file different from a <code>home.php</code> or <code>index.php</code> file.</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">
+
+&lt;header class="page-header"&gt;
+	&lt;?php
+		the_archive_title( '
+
+&lt;h1 class="page-title"&gt;', '&lt;/h1&gt;
+
+
+' );
+		the_archive_description( '
+
+&lt;div class="taxonomy-description"&gt;', '&lt;/div&gt;
+
+
+' );
+	?&gt;
+&lt;/header&gt;
+
+
+&lt;!-- .page-header --&gt;
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="author-php-and-date-php" tabindex="-1">Author.php and Date.php <a href="#author-php-and-date-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Author.php and Date.php</span></a></h2>
+<p><code>Author.php</code> and <code>date.php</code> are more specific archive type files.  If you need a refresher check out where they fit within the <a href="https://developer.wordpress.org/themes/basics/template-hierarchy/">template heirarchy</a>. Generally, <code>archive.php</code> will suffice for most themes’ needs and you won’t need to create these templates.</p>
+<h3 class="toc-heading" id="author-php" tabindex="-1">Author.php <a href="#author-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Author.php</span></a></h3>
+<p>If you are building a theme designed for multiple authors, it might make sense to build an author.php template.  In the <code>author.php</code> template you could provide more information about an author, their gravatar, pull in their social media sites, and then all posts written by them.  This would be a step up from relying just on the <code>archive.php</code> file.</p>
+<p>Additionally, you can build specific <code>author.php</code> files for individual author’s by using their author ID or nicename.  For example, say John Doe is the head author for a site with many guest authors.  You may want all the guest authors’ information to display with author.php but you might build a specific author page with more information for John Doe by creating <code>author-johndoe.php</code> or <code>author-3.php</code> if his author ID is 3.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="date-php" tabindex="-1">Date.php <a href="#date-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Date.php</span></a></h3>
+<p>Similarly, if you are building a theme directed at magazine or news websites, a <code>date.php</code> file might make sense to build as these websites frequently organize their articles and posts by date or issue.  Additionally, you could build a <code>day.php</code>, <code>month.php</code>, or <code>year.php</code> if you found enough justification for it.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="category-php-tag-php-and-taxonomy-php" tabindex="-1">Category.php, Tag.php, and Taxonomy.php <a href="#category-php-tag-php-and-taxonomy-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Category.php, Tag.php, and Taxonomy.php</span></a></h2>
+<p>If you need a refresher on what <a href="https://developer.wordpress.org/themes/basics/categories-tags-custom-taxonomies/">categories, tags, &amp; taxonomies</a> are you can look at their page.  Often you won’t need to build out these template files.  However, in an example of building a theme for food bloggers, there are some use cases for building these specific templates. In a food blogger website, the categories could be Great Restaurants, Beautiful Food, Ethnic Cuisine, and Recipes.</p>
+<p>You might want most of your blog posts to display the same way except for any blogs that are categorized as recipes, because all recipes have ingredients and instrucitons sections.  Therefore, you may want to build a <code>category-recipe.php</code> file to display your recipe blog posts in a grid view with some of the important details about the recipe visible.</p>
+<p>Additionally, perhaps chocolate is a really important tag for the theme you’re building.  It might make sense to build a <code>tag-chocolate.php</code> file so that you can display a specialized banner image of chocolate.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="search-php" tabindex="-1">Search.php <a href="#search-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Search.php</span></a></h2>
+<p>Most themes have a search.php file so it is clear to users that their query went through.  It is common to have some sort of header identifying the query results such as this snippet found int twenty fifteen’s theme.</p>
+<pre class="brush: php; title: ; notranslate" title="">
+
+&lt;header class="page-header"&gt;
+
+
+&lt;h1 class="page-title"&gt;&lt;?php printf( __( 'Search Results for: %s', 'twentyfifteen' ), get_search_query() ); ?&gt;&lt;/h1&gt;
+
+
+&lt;/header&gt;
+
+
+&lt;!-- .page-header --&gt;
+</pre>
+<p>This code snippet pulls in the query that was searched with <code>get_search_query()</code>. Often <code>search.php</code> will only pull in the excerpt instead of the full content since the user is trying to determine if the article or page fits their search.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/template-files-section/" rel="previous"><span class="meta-nav">←</span> Template Files Section</a><a href="https://developer.wordpress.org/themes/template-files-section/page-template-files/" rel="next">Page Templates <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+    </main>
+    
+    <main id="main" class="site-main post-11273 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>Page Templates</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#uses-for-page-templates">Uses for Page Templates</a></li>
+<li><a href="#page-templates-within-the-template-hierarchy">Page Templates within the Template Hierarchy</a></li>
+<li><a href="#page-templates-purpose%c2%a0-user-control">Page Templates Purpose&nbsp;&amp; User Control</a></li>
+<li><a href="#file-organization-of-page-templates">File Organization of Page Templates</a></li>
+<li><a href="#creating-custom-page-templates-for-global-use">Creating Custom Page Templates for Global Use</a></li>
+<li><a href="#creating-a-custom-page-template-for-one-specific-page">Creating a Custom Page Template for One Specific Page</a></li>
+<li><a href="#creating-page-templates-for-specific-post-types">Creating page templates for specific post types</a></li>
+<li><a href="#using-conditional-tags-in-page-templates">Using Conditional Tags in Page Templates</a></li>
+<li><a href="#identifying-a-page-template">Identifying a Page Template</a></li>
+<li><a href="#page-template-functions">Page Template Functions</a></li></ul>
+</div>
+<p>Page templates are a specific type of <a title="Template Files" href="https://developer.wordpress.org/themes/basics/template-files/">template file</a>&nbsp;that can be applied to a specific page or groups of pages.</p>
+<div class="callout callout-info"><p><span class="screen-reader-text">Note:</span> As of WordPress 4.7 page templates support all post types. For more details how to set a page template to specific post types <a href="#creating-page-templates-for-specific-post-types">see example below</a>.</p>
+</div>
+<p>Since a page template is a specific&nbsp;type of template file, here are some distinguishing features of page templates:</p>
+<ul>
+<li>Page templates are used to change the look and feel of a page.</li>
+<li>A page template can be applied to a single page, a page section, or a class of pages.</li>
+<li>Page templates generally have&nbsp;a high&nbsp;level of specificity, targeting an individual page or group of pages. For example, a page template named&nbsp;<code>page-about.php</code>&nbsp;is more specific than the template files <code>page.php</code> or <code>index.php</code> as it will only affect a page with the slug of “about.”</li>
+<li>If a page template has a template name, WordPress users editing the page have control over what template will be used to render the page.</li>
+</ul>
+<h2 class="toc-heading" id="uses-for-page-templates" tabindex="-1">Uses for Page Templates <a href="#uses-for-page-templates" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Uses for Page Templates</span></a></h2>
+<p>Page templates display your&nbsp;site’s dynamic content on a page, e.g., posts, news updates, calendar events, media files, etc. You&nbsp;may decide that you want your homepage to look a specific way, that is quite different to other&nbsp;parts of your site. Or, you may want to display a featured image that links to a post on one part of the page, have a list of latest posts elsewhere, and use a custom navigation. You can use page templates to achieve&nbsp;these things.</p>
+<p>This section shows you how to build page templates that can be selected by your users through their admin screens.</p>
+<p>For example, you can build page templates for:</p>
+<ul>
+<li>full-width, one-column</li>
+<li>two-column with a sidebar on the right</li>
+<li>two-column with a sidebar on the left</li>
+<li>three-column</li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="page-templates-within-the-template-hierarchy" tabindex="-1">Page Templates within the Template Hierarchy <a href="#page-templates-within-the-template-hierarchy" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Page Templates within the Template Hierarchy</span></a></h2>
+<p>When a person browses to your website, WordPress selects which template to use for rendering that page. As we learned earlier in the&nbsp;<a title="Template Hierarchy" href="https://developer.wordpress.org/themes/basics/template-hierarchy/">Template Hierarchy</a>, WordPress looks for template files in the following order:</p>
+<ol>
+<li><strong>Page&nbsp;Template —</strong>&nbsp;If the page has a custom template assigned, WordPress looks for that file and, if found, uses it.</li>
+<li><strong><code>page-{slug}.php</code>&nbsp;—</strong>&nbsp;If no custom template has been assigned,&nbsp;WordPress looks for and uses&nbsp;a specialized template that contains the&nbsp;page’s slug.</li>
+<li><strong><code>page-{id}.php</code>&nbsp;—</strong>&nbsp;If a specialized&nbsp;template that includes the page’s slug is not found,&nbsp;WordPress looks for and uses a specialized template named with the page’s ID.</li>
+<li><strong><code>page.php</code>&nbsp;—</strong>&nbsp;If a specialized template that includes the page’s ID is not found,&nbsp;WordPress looks for and uses the theme’s default page template.</li>
+<li><strong><code>singular.php</code> —</strong> If <code>page.php</code> is not found, WordPress looks for and uses the theme’s template used for a single post, irregardless of post type.</li>
+<li><strong><code>index.php</code>&nbsp;—</strong>&nbsp;If no specific page templates are assigned or found, WordPress defaults back to using the theme’s index file to render pages.</li>
+</ol>
+<div class="callout callout-alert"><p><span class="screen-reader-text">Alert:</span> There is also a WordPress-defined template named&nbsp;<code>paged.php</code>. It is&nbsp;<em>not</em>&nbsp;used for the page post-type but rather for displaying multiple pages of archives.</p>
+</div>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="page-templates-purpose%c2%a0-user-control" tabindex="-1">Page Templates Purpose&nbsp;&amp; User Control <a href="#page-templates-purpose%c2%a0-user-control" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Page Templates Purpose&nbsp;&amp; User Control</span></a></h2>
+<p>If you plan on making a custom page template for your theme, you should decide a couple of things before proceeding:</p>
+<ul>
+<li>Whether the page template will be for one specific page or for any page; and</li>
+<li>What type of user control you want available for the&nbsp;template.</li>
+</ul>
+<p>Every page template that has a&nbsp;template name&nbsp;can be selected by a user when they create or edit a page. The list of available templates&nbsp;can be found at&nbsp;<strong>Pages &gt; Add New &gt; Attributes &gt; Template</strong>. Therefore, a WordPress user can choose any page template with a template name, which might not be your intention.</p>
+<p>For example, if you want to have a specific template for your “About” page, it might not be appropriate to name that page template “About Template” as it&nbsp;would be globally available to all pages (i.e. the user could apply it to any page). Instead, <a href="https://developer.wordpress.org/themes/basics/page-templates/#creating-a-custom-page-template-for-one-specific-page">create&nbsp;a single use template</a>&nbsp;and WordPress will render the page with the appropriate template, whenever a user visits the “About” page.</p>
+<p>Conversely, many themes include the ability to choose how many columns a page will have. Each of these options is a page template that is available globally. To give your WordPress users this global option, you will need to create page templates for each option and give each a template name.</p>
+<p>Dictating whether a template is for global use vs. singular use is achieved by the way the file is named and whether or not is has a specific comment.</p>
+<div class="callout callout-info"><p><span class="screen-reader-text">Note:</span> Sometimes it is appropriate to have a template globally available even if it appears to be a single use case. When you’re creating themes for release, it can be hard to predict what a user will name&nbsp;their pages. Portfolio pages are a great example as not every WordPress user will name their portfolio the same thing or have the same page ID and yet they may want to use&nbsp;that template.</p>
+</div>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="file-organization-of-page-templates" tabindex="-1">File Organization of Page Templates <a href="#file-organization-of-page-templates" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">File Organization of Page Templates</span></a></h2>
+<p>As discussed in <a href="https://developer.wordpress.org/themes/basics/organizing-theme-files/">Organizing Theme Files</a>,&nbsp;WordPress recognizes the subfolder <strong>page-templates</strong>. Therefore, it’s a good idea to store your global page templates in this folder to help keep them organized.</p>
+<div class="callout callout-alert"><p><span class="screen-reader-text">Alert:</span> A specialized page template file (those created for only one time use) <strong>cannot</strong>&nbsp;be in a sub-folder, nor, if using a&nbsp;<a href="https://developer.wordpress.org/themes/advanced-topics/child-themes/#how-to-create-a-child-theme">Child Theme</a>, in the&nbsp;Parent Theme’s folder.</p>
+</div>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="creating-custom-page-templates-for-global-use" tabindex="-1">Creating Custom Page Templates for Global Use <a href="#creating-custom-page-templates-for-global-use" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Creating Custom Page Templates for Global Use</span></a></h2>
+<p>Sometimes you’ll want a template that can be used&nbsp;globally by any page, or by multiple pages. &nbsp;Some developers will group their templates with a filename prefix, such as&nbsp;<code>page_two-columns.php</code></p>
+<div class="callout callout-alert"><p><span class="screen-reader-text">Alert:</span> &nbsp;<strong><em>Important!</em></strong> Do not use <code>page-</code> as a&nbsp;prefix, as WordPress will interpret the file as a&nbsp;specialized template, meant to apply to only <em>one</em> page on your site. </p>
+</div>
+<p>For information on theme file-naming conventions and filenames you cannot use, see&nbsp;<a title="Theme Development" href="https://developer.wordpress.org/themes/basics/template-files/#common-wordpress-template-files">reserved theme filenames</a>.</p>
+<div class="callout callout-tip"><p><span class="screen-reader-text">Tip:</span> A quick, safe method for creating a new page template is to make a copy of&nbsp;<code>page.php</code> and give the new file a distinct filename. That way, you start off with the HTML structure of your other pages and you can edit the new file as needed.</p>
+</div>
+<p>To create a global template, write an opening PHP comment at the top of the file that states the template’s name.</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php /* Template Name: Example Template */ ?&gt;
+</pre>
+<p>&nbsp;</p>
+<p>It’s a good idea to choose a name that describes what the template does as the name is visible to WordPress users when they are editing the page. For example, you could&nbsp;name your template&nbsp;Homepage, Blog, or Portfolio.</p>
+<p>This example from the TwentyFourteen&nbsp;theme creates a page template called Full Width Page:</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php
+/**
+ * Template Name: Full Width Page
+ *
+ * @package WordPress
+ * @subpackage Twenty_Fourteen
+ * @since Twenty Fourteen 1.0
+ */
+</pre>
+<p><img class=" size-full wp-image-11279 alignleft" src="https://developer.wordpress.org/files/2014/10/basics-page-templates-03.png" alt="basics-page-templates-03" width="180" height="212">Once you upload the file to your theme’s folder (e.g., page-templates), go to the&nbsp;<strong>Page &gt; Edit</strong>&nbsp;screen&nbsp;in your admin dashboard.</p>
+<p>On the right hand side under&nbsp;<strong>attributes&nbsp;</strong>you’ll see <strong>template</strong>. &nbsp;This is where users are able to access your global page templates.</p>
+<div class="callout callout-tip"><p><span class="screen-reader-text">Tip:</span> The select list has a maximum width of 250px, so longer names may be cut off.</p>
+</div>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="creating-a-custom-page-template-for-one-specific-page" tabindex="-1">Creating a Custom Page Template for One Specific Page <a href="#creating-a-custom-page-template-for-one-specific-page" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Creating a Custom Page Template for One Specific Page</span></a></h2>
+<p>As mentioned in the&nbsp;<a title="Template Hierarchy" href="https://developer.wordpress.org/themes/basics/template-hierarchy/">Template Hierarchy</a>&nbsp;page, you can create a template for a specific page. &nbsp;To create a template for&nbsp;one specific page, copy your existing <code>page.php</code> file and rename it with your page’s slug or ID:</p>
+<ol>
+<li><code>page-{slug}.php</code></li>
+<li><code>page-{ID}.php</code></li>
+</ol>
+<p>For example: Your About page has a slug of&nbsp;‘about’&nbsp;and an ID of&nbsp;6. If your active theme’s folder has a file named&nbsp;<code>page-about.php</code>&nbsp;or&nbsp;<code>page-6.php</code>, then WordPress will automatically find and use that file to render the About page.</p>
+<p>To be used, specialized page templates must be in your theme’s folder (i.e.&nbsp;<strong>/wp-content/themes/my-theme-name/ </strong>).</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="creating-page-templates-for-specific-post-types" tabindex="-1">Creating page templates for specific post types <a href="#creating-page-templates-for-specific-post-types" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Creating page templates for specific post types</span></a></h2>
+<p>By default, a custom page template will be available&nbsp;to the “page” post type.</p>
+<p>To create a page template to specific post types, add a line under the template name with the post types you would like the template to support.</p>
+<p>Example:</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php 
+/*
+Template Name: Full-width layout
+Template Post Type: post, page, event
+*/ 
+// Page code here...
+</pre>
+<div class="callout callout-alert"><p><span class="screen-reader-text">Alert:</span> This ability to add page templates to post types other than “page” post type is supported&nbsp;only from WordPress 4.7</p>
+</div>
+<p>When at least one template exists for a post type, the ‘Post Attributes’ meta box will be displayed in the back end, without the need to add post type support for ‘page-attributes’ or anything else. The ‘Post Attributes’ label can be customzied per post type using the ‘attributes’ label when registering a post type.</p>
+<p><strong>Backward Compatibility:</strong></p>
+<p>Let’s say you want to publicly release a theme with support for post type templates. WordPress versions before 4.7 will ignore the Template Post Type header and show the template in the list of page templates, even though it only works for regular posts. To prevent that, you can hook into the theme_page_templates filter to exclude it from the list. Here’s an example:</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">/**
+ * Hides the custom post template for pages on WordPress 4.6 and older
+ *
+ * @param array $post_templates Array of page templates. Keys are filenames, values are translated names.
+ * @return array Filtered array of page templates.
+ */
+function makewp_exclude_page_templates( $post_templates ) {
+    if ( version_compare( $GLOBALS['wp_version'], '4.7', '&lt;' ) ) {
+        unset( $post_templates['templates/my-full-width-post-template.php'] );
+    }
+ 
+    return $post_templates;
+}
+ 
+add_filter( 'theme_page_templates', 'makewp_exclude_page_templates' );
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p>That way you can support custom post type templates in WordPress 4.7 and beyond while maintaining full backward compatibility.</p>
+<p>Note that theme_page_templates is actually a dynamic theme_{$post_type}_templates filter. The dynamic portion of the hook name, $post_type, refers to the post type supported by the templates. E.g. you can hook into theme_product_templates to filter the list of templates for the product post type.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="using-conditional-tags-in-page-templates" tabindex="-1">Using Conditional Tags in Page Templates <a href="#using-conditional-tags-in-page-templates" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Using Conditional Tags in Page Templates</span></a></h2>
+<p>You can make smaller, page-specific changes with&nbsp;<a href="https://developer.wordpress.org/themes/basics/conditional-tags/">Conditional Tags</a>&nbsp;in your theme’s&nbsp;<code>page.php</code> file. For instance, the below example code&nbsp;loads the file <code>header-home.php</code> for your front page, but loads another file (<code>header-about.php</code>) for your About page, and then applies the default&nbsp;<code>header.php</code> for all other pages.</p>
+<pre class="brush: php; title: ; notranslate" title="">if ( is_front_page() ) :
+    get_header( 'home' );
+elseif ( is_page( 'About' ) ) :
+    get_header( 'about' );
+else:
+    get_header();
+endif;
+</pre>
+<p><a href="https://developer.wordpress.org/themes/basics/conditional-tags/">You can learn more about Conditional Tags here.</a></p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="identifying-a-page-template" tabindex="-1">Identifying a Page Template <a href="#identifying-a-page-template" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Identifying a Page Template</span></a></h2>
+<p>If your template uses the&nbsp;<code><a href="https://developer.wordpress.org/reference/functions/body_class/">body_class()</a></code>&nbsp;function, WordPress will print classes in the&nbsp;<code>body</code> tag for the post type class name (<code>page</code>), the page’s ID (<code>page-id-{ID}</code>), and the page template used. For the default&nbsp;<code>page.php</code>, the class name generated is&nbsp;<code>page-template-default</code>:</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;body class="page page-id-6 page-template-default"&gt;
+</pre>
+<div class="callout callout-info"><p><span class="screen-reader-text">Note:</span>  A&nbsp;specialized template (<code>page-{slug}.php</code>&nbsp;or&nbsp;<code>page-{ID}.php</code>) also gets the&nbsp;<code>page-template-default</code>&nbsp;class rather than its own body class.</p>
+</div>
+<p>When using a custom page template, the class&nbsp;<code>page-template</code>&nbsp;will print, along with a class naming the specific template. For example, if your custom page template file is named as follows:</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php
+/* Template Name: My Custom Page */
+?&gt;
+</pre>
+<p>Then then rendered HTML generated will be as follows:</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;body class="page page-id-6 page-template page-template-my-custom-page-php"&gt;
+</pre>
+<p>Notice the <code>page-template-my-custom-page-php</code>&nbsp;class that is applied to the <code>body</code> tag.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="page-template-functions" tabindex="-1">Page Template Functions <a href="#page-template-functions" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Page Template Functions</span></a></h2>
+<p>These built-in WordPress functions and methods can help you work with page templates:</p>
+<ul>
+<li><code><a href="https://developer.wordpress.org/reference/functions/get_page_template/">get_page_template()</a></code> returns the path of the page template used to render the page.</li>
+<li><code><a href="https://developer.wordpress.org/reference/classes/wp_theme/get_page_templates/">wp_get_theme()-&gt;get_page_templates()</a></code>&nbsp;returns all custom page templates available to the currently active theme (<code>get_page_templates()</code> is a method of the <code><a href="https://developer.wordpress.org/reference/classes/wp_theme/">WP_Theme</a></code> class).</li>
+<li><code><a href="https://developer.wordpress.org/reference/functions/is_page_template/">is_page_template()</a></code>&nbsp;returns true or false depending on whether a custom page template was used to render the page.</li>
+<li><code><a href="https://developer.wordpress.org/reference/functions/get_page_template_slug/">get_page_template_slug()</a></code> returns the value of custom field <code>_wp_page_template</code>&nbsp;(<code>null</code>&nbsp;when the value is empty or “default”).If a page has been assigned a custom template, the filename of that template is stored as the value of a&nbsp;<a title="Custom Fields" href="https://codex.wordpress.org/Custom_Fields">custom field</a>&nbsp;named&nbsp;<code>'_wp_page_template'</code>&nbsp;(in the&nbsp;<a title="Database Description" href="https://codex.wordpress.org/Database_Description#Table:_wp_postmeta"><code>wp_postmeta</code></a>&nbsp;database table). (Custom fields starting with an underscore do not display in the edit screen’s custom fields module.)</li>
+</ul>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+		</main>
+    <main id="main" class="site-main post-17405 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>Attachment Template Files</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#mime_type-php">MIME_type.php</a></li>
+<li><a href="#attachment-php">Attachment.php</a></li>
+<li><a href="#function-reference">Function Reference</a></li></ul>
+</div>
+<p>Attachments are a special post type&nbsp;that holds information about a file uploaded through the WordPress media upload system, such as its description and name, which can display through&nbsp;several <b>post type – attachment</b> template files.</p>
+<p>For&nbsp;images, as an example, the attachment post type links to metadata information, about the size of the images, the thumbnails generated, the location of the image files, the HTML alt text, and even information obtained from EXIF data embedded in the images.</p>
+<div class="callout callout-tip"><p><span class="screen-reader-text">Tip:</span> Utilizing attachment templates to gain additional metadata information for uploads, help with SEO efforts. </p>
+</div>
+<p>As shown in the <a href="https://developer.wordpress.org/themes/basics/template-hierarchy/#visual-overview">template hierarchy</a>,&nbsp;you are able to display your&nbsp;attachments through several template&nbsp;files in order of fallback:</p>
+<ol>
+<li><code>MIME_type.php</code> and a <code>subtype.php</code><br>It can be any MIME type (For example: <code>image.php</code>, <code>video.php</code>, <code>application.php</code>). For text/plain, the following path is used (in order):
+<ol>
+<li><code>text_plain.php</code></li>
+<li><code>plain.php</code></li>
+<li><code>text.php</code></li>
+</ol>
+</li><li><code>attachment.php</code></li>
+<li><code>single-attachment.php</code></li>
+<li><code>single.php</code></li>
+<li><code>singular.php</code></li>
+<li><code>index.php</code></li>
+</ol>
+
+<h2 class="toc-heading" id="mime_type-php" tabindex="-1">MIME_type.php <a href="#mime_type-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">MIME_type.php</span></a></h2>
+<p>Attachments are served by template files based on their mime-type. As an example, if your attachment is an image, your can customize how they&nbsp;display through the creation of an&nbsp;<code>image.php</code>&nbsp;template file. All images with the <code>post_mime_type</code> of image/* will render though your&nbsp;<code>image.php&nbsp;</code> template file.</p>
+<p>Attachments&nbsp;also support the use of a mime <code>subtype.php</code>&nbsp;file. To continue with the image example, you can further customize your theme to support not only an <code>image.php</code>&nbsp;file but a <code>jpg.php</code> subtype file.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="attachment-php" tabindex="-1">Attachment.php <a href="#attachment-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Attachment.php</span></a></h2>
+<p>An attachment page (<code>attachment.php</code>) is a single post page with the post type of attachment, generated through the creation of an attachment.php. Just like a <a href="https://developer.wordpress.org/themes/template-files-section/post-template-files/#single-php">single post page</a>, which is dedicated to your article, the attachment page provides a dedicated page in attachments in your theme.</p>
+<p>Creation of attachment page is as simple as creating an attachment.php&nbsp;file. The attachment.php file&nbsp;then contains code similar to the single.php&nbsp;post page.</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">
+
+&lt;div class="entry-attachment"&gt;
+       &lt;?php $image_size = apply_filters( 'wporg_attachment_size', 'large' ); 
+             echo wp_get_attachment_image( get_the_ID(), $image_size ); ?&gt;
+
+           &lt;?php if ( has_excerpt() ) : ?&gt;
+      
+           &lt;div class="entry-caption"&gt;
+                 &lt;?php the_excerpt(); ?&gt;
+           &lt;/div&gt;&lt;!-- .entry-caption --&gt;
+       &lt;?php endif; ?&gt;
+&lt;/div&gt;&lt;!-- .entry-attachment --&gt;
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="function-reference" tabindex="-1">Function Reference <a href="#function-reference" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Function Reference</span></a></h2>
+<ul>
+<li><a href="https://developer.wordpress.org/reference/functions/get_attachment_template/">get_attachment_template()</a> : Retrieve path of attachment template in current or parent template.</li>
+</ul>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/template-files-section/page-template-files/" rel="previous"><span class="meta-nav">←</span> Page Templates</a><a href="https://developer.wordpress.org/themes/template-files-section/custom-post-type-template-files/" rel="next">Custom Post Type Template Files <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+    </main>
+    
+    <main id="main" class="site-main post-17407 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>Custom Post Type Template Files</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#custom-post-type-template-hierarchy">Custom Post Type – Template Hierarchy </a></li>
+<li><a href="#custom-post-type-templates">Custom Post Type templates </a></li>
+<li><a href="#search-in-custom-post-types">Search in Custom Post Types</a></li>
+<li><a href="#function-reference">Function Reference  </a></li></ul>
+</div>
+<p>The WordPress theme system supports custom <a href="https://developer.wordpress.org/themes/basics/template-files/">templates</a> for custom post types. Custom templates for the single display of posts belonging to custom post types have been supported since WordPress <a href="https://codex.wordpress.org/Version_3.0">Version 3.0</a> and the support for custom templates for archive displays was added in <a href="https://codex.wordpress.org/Version_3.1">Version 3.1</a>.</p>
+<h2 class="toc-heading" id="custom-post-type-template-hierarchy" tabindex="-1">Custom Post Type – Template Hierarchy  <a href="#custom-post-type-template-hierarchy" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Custom Post Type – Template Hierarchy </span></a></h2>
+<p>WordPress will work through the <a href="https://developer.wordpress.org/themes/basics/template-hierarchy/">template hierarchy</a> and use the template file it comes across first. So if you want to create a custom template for your <code>acme_product</code> custom post type, a good place to start is by copying the <code>single.php</code> file, saving it as <code>single-acme_product.php</code> and editing that.</p>
+<p>However if you don’t want to create custom template files, WordPress will use the files already present in your theme, which would be <code>archive.php</code> and <code>single.php</code> and <code>index.php</code> files.</p>
+<p>Single posts and their archives can be displayed using the <code>single.php</code> and <code>archive.php</code> template files respectively,</p>
+<ul>
+<li>single posts of a custom post type will use <strong>single-{post_type}.php</strong> </li>
+<li>and their archives will use <strong>archive-{post_type}.php</strong> </li>
+<li>and if you don’t have this post type archive page you can pass <strong>BLOG_URL?post_type={post_type}</strong> </li>
+</ul>
+<p>where <code>{post_type}</code> is the <code>$post_type</code> argument of the <a href="https://developer.wordpress.org/reference/functions/register_post_type/">register_post_type()</a> function.</p>
+<p>So for the above example, you could create <code>single-acme_product.php</code> and <code>archive-acme_product.php</code> template files for single product posts and their archives.</p>
+<p>Alternatively, you can use the <code>is_post_type_archive()</code> function in any template file to check if the query shows an archive page of a given post types(s), and the <code>post_type_archive_title()</code> to display the post type title.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="custom-post-type-templates" tabindex="-1">Custom Post Type templates  <a href="#custom-post-type-templates" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Custom Post Type templates </span></a></h2>
+<ul>
+<li><strong>single-{post-type}.php</strong><br>
+The single post template used when a visitor requests a single post from a custom post type. For example, <code>single-acme_product.php</code> would be used for displaying single posts from a custom post type named <code>acme_product</code>.  </li>
+<li><strong>archive-{post-type}.php</strong><br>
+The archive post type template is used when visitors request a custom post type archive. For example, <code>archive-acme_product.php</code> would be used for displaying an archive of posts from the custom post type named <code>acme_product</code>. The <code>archive.php</code> template file is used if the <code>archive-{post-type}.php</code> is not present.</li>
+<li><strong>search.php</strong><br>
+The search results template is used to display a visitor’s search results. To include search results from your custom post type, <a href="#search-in-custom-post-types">refer to the code sample below</a>.</li>
+<li><strong>index.php</strong><br>
+The <code>index.php</code> is used if a specific query template (<code>single-{post-type}.php, single.php, archive-{post-type}.php, archive.php, search.php</code>) for the custom post type is not present.</li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="search-in-custom-post-types" tabindex="-1">Search in Custom Post Types <a href="#search-in-custom-post-types" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Search in Custom Post Types</span></a></h2>
+<p>By default search results do not include custom post type content into the search results. The code can be appended to functions.php to include <abbr title="Custom Post Types">CPT</abbr> in search results :</p>
+<pre class="brush: php; title: ; notranslate" title="">// Show posts of 'post', 'page', 'acme_product' and 'movie' post types on home page
+function search_filter( $query ) {
+  if ( !is_admin() &amp;&amp; $query-&gt;is_main_query() ) {
+    if ( $query-&gt;is_search ) {
+      $query-&gt;set( 'post_type', array( 'post', 'page', 'acme_product', 'movie' ) );
+    }
+  }
+}
+
+add_action( 'pre_get_posts','search_filter' );
+</pre>
+<p>In the above code, the function search_filter hooks on <a href="https://developer.wordpress.org/reference/hooks/pre_get_posts/">pre_get_posts</a>. This function will limit the search results to display posts, pages and custom post types movie and acme_product. </p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="function-reference" tabindex="-1">Function Reference   <a href="#function-reference" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Function Reference  </span></a></h2>
+<ul>
+<li><a href="https://developer.wordpress.org/reference/functions/register_post_type/">register_post_type()</a> : Registers a post type.</li>
+<li><a href="https://developer.wordpress.org/reference/functions/is_post_type_archive/">is_post_type_archive()</a> : Checks if  the query for an existing post type archive page.</li>
+<li><a href="https://developer.wordpress.org/reference/functions/post_type_archive_title/">post_type_archive_title()</a> : Display or retrieve title for a post type archive.</li>
+</ul>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+		
+    </main>
+    <main id="main" class="site-main post-17409 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>Partial and Miscellaneous Template Files</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#introduction">Introduction</a></li>
+<li><a href="#header-php">Header.php</a></li>
+<li><a href="#footer-php">Footer.php</a></li>
+<li><a href="#404-php">404.php</a></li>
+<li><a href="#comments-php">Comments.php</a></li>
+<li><a href="#sidebar-php">Sidebar.php</a></li>
+<li><a href="#content-slug-php">Content-{$slug}.php</a></li></ul>
+</div>
+<h2 class="toc-heading" id="introduction" tabindex="-1">Introduction <a href="#introduction" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Introduction</span></a></h2>
+<p>Not all template files generate the entire content that will be rendered by the browser. &nbsp;Some template files are pulled in by other template files such as <code>comments.php, header.php, footer.php, sidebar.php</code> and <code>content-{$slug}.php</code>. You’ll walk through each of these template files to get an understanding of the purpose and how to build them.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="header-php" tabindex="-1">Header.php <a href="#header-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Header.php</span></a></h2>
+<p>The <code>header.php</code> file does exactly what you would expect. &nbsp;It contains all the code that the browser will render for the header. &nbsp;This is a partial template file because unless a different template file calls the <a href="https://developer.wordpress.org/themes/basics/template-tags/">template tag</a>, <code>get_header()</code>, the browser will not render the contents of this file.</p>
+<p>Often sites have the same header regardless of the page or post you’re on. &nbsp;However, some sites have slight variations such as a secondary navigation or different banner image depending on the page. &nbsp;Your <code>header.php</code> file can handle all these variations if you use <a href="https://developer.wordpress.org/themes/basics/conditional-tags/">conditional tags</a>.</p>
+<p>Almost all themes have a <code>header.php</code> file as the functionality and maintainability of this file pretty much demands its creation.</p>
+<p>Below is an example of a header.php found in the twenty fifteen theme.</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">&lt;!DOCTYPE html&gt;
+&lt;html &lt;?php language_attributes(); ?&gt; class="no-js"&gt;
+&lt;head&gt;
+	&lt;meta charset="&lt;?php bloginfo( 'charset' ); ?&gt;"&gt;
+	&lt;meta name="viewport" content="width=device-width"&gt;
+	&lt;link rel="profile" href="http://gmpg.org/xfn/11"&gt;
+	&lt;link rel="pingback" href="&lt;?php bloginfo( 'pingback_url' ); ?&gt;"&gt;
+	&lt;!--[if lt IE 9]&gt;
+	&lt;script src="&lt;?php echo esc_url( get_template_directory_uri() ); ?&gt;/js/html5.js"&gt;&lt;/script&gt;
+	&lt;![endif]--&gt;
+	&lt;?php wp_head(); ?&gt;
+&lt;/head&gt;
+
+&lt;body &lt;?php body_class(); ?&gt;&gt;
+
+
+&lt;div id="page" class="hfeed site"&gt;
+	&lt;a class="skip-link screen-reader-text" href="#content"&gt;&lt;?php _e( 'Skip to content', 'twentyfifteen' ); ?&gt;&lt;/a&gt;
+
+
+
+&lt;div id="sidebar" class="sidebar"&gt;
+
+
+&lt;header id="masthead" class="site-header" role="banner"&gt;
+
+
+&lt;div class="site-branding"&gt;
+				&lt;?php if ( is_front_page() &amp;&amp; is_home() ) : ?&gt;
+
+
+&lt;h1 class="site-title"&gt;&lt;a href="&lt;?php echo esc_url( home_url( '/' ) ); ?&gt;" rel="home"&gt;&lt;?php bloginfo( 'name' ); ?&gt;&lt;/a&gt;&lt;/h1&gt;
+
+
+					&lt;?php else : ?&gt;
+
+
+&lt;a href="&lt;?php echo esc_url( home_url( '/' ) ); ?&gt;" rel="home"&gt;&lt;?php bloginfo( 'name' ); ?&gt;&lt;/a&gt;
+
+					&lt;?php endif; $description = get_bloginfo( 'description', 'display' ); if ( $description || is_customize_preview() ) : ?&gt;
+
+
+&lt;?php echo $description; ?&gt;
+
+					&lt;?php endif; ?&gt;
+				&lt;button class="secondary-toggle"&gt;&lt;?php _e( 'Menu and widgets', 'twentyfifteen' ); ?&gt;&lt;/button&gt;
+			&lt;/div&gt;
+
+
+&lt;!-- .site-branding --&gt;
+		&lt;/header&gt;
+
+
+&lt;!-- .site-header --&gt;
+
+		&lt;?php get_sidebar(); ?&gt;
+	&lt;/div&gt;
+
+
+&lt;!-- .sidebar --&gt;
+
+
+
+&lt;div id="content" class="site-content"&gt;
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p>Some of the code may look a little daunting at first, but if we break it down, it becomes simple enough. After the opening commment, the <code>head</code> is created. The template tag <code>wp_head()</code> pulls in all of our styles and any scripts that would appear in the head rather than the footer that we enqueued in our <code>functions.php</code> file.</p>
+<p>Next the <code>body</code> is opened and a mix of HTML and PHP are present. You can see some conditional tags in the site branding div that tweak a little bit of what is shown based on the page the user is on. Then the site navigation is pulled in. Lastly, the main site-content div is opened which will be closed most likely in the <code>footer.php</code> file.</p>
+<p>One important template tag to note is <code>body_class()</code> found in the opening <code>body</code> tag. This is a super handy tag that makes styling your theme a lot easier by giving your body classes depending on the template file and other settings being used.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="footer-php" tabindex="-1">Footer.php <a href="#footer-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Footer.php</span></a></h2>
+<p>Much like the <code>header.php</code> file the <code>footer.php</code> is a very common template file that most themes utilize. The code in the <code>footer.php</code> file will not be rendered unless another template file pulls in the <code>footer.php</code> with <code>get_footer()</code> <a href="https://developer.wordpress.org/themes/basics/template-tags/">template tag</a>. &nbsp;Similarly to headers, you can make variations of footers using <a href="https://developer.wordpress.org/themes/basics/conditional-tags/">conditional tags</a>.</p>
+<p>Often developers will put <a href="https://developer.wordpress.org/themes/functionality/widgets/">widgetized areas</a> in the footer so that the end user can easily drop and drag different content types into the footer.</p>
+<p>Here is an example of a <code>footer.php</code> file from the Twenty Fifteen theme.</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">	&lt;/div&gt;
+
+
+&lt;!-- .site-content --&gt;
+
+
+
+&lt;footer id="colophon" class="site-footer" role="contentinfo"&gt;
+
+
+&lt;div class="site-info"&gt;
+			&lt;?php /** * Fires before the Twenty Fifteen footer text for footer customization. * * @since Twenty Fifteen 1.0 */ do_action( 'twentyfifteen_credits' ); ?&gt;
+			&lt;a href="&lt;?php echo esc_url( __( 'https://wordpress.org/', 'twentyfifteen' ) ); ?&gt;"&gt;&lt;?php printf( __( 'Proudly powered by %s', 'twentyfifteen' ), 'WordPress' ); ?&gt;&lt;/a&gt;
+		&lt;/div&gt;
+
+
+&lt;!-- .site-info --&gt;
+	&lt;/footer&gt;
+
+
+&lt;!-- .site-footer --&gt;
+
+&lt;/div&gt;
+
+
+&lt;!-- .site --&gt;
+
+&lt;?php wp_footer(); ?&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="404-php" tabindex="-1">404.php <a href="#404-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">404.php</span></a></h2>
+<p>When users try to visit a page on your website that doesn’t exist they’ll be directed to your <code>index.php</code> page unless you’ve created a 404.php template. &nbsp;It’s a good idea to have some sort of message that the explains the page is missing or no longer available. &nbsp;Creating this template helps keep the visual aspects of your theme consistent and provides your end users with helpful information.</p>
+<p>Here is an example of a 404.php template file from the twenty fifteen theme.</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">
+get_header(); ?&gt;
+
+
+
+&lt;div id="primary" class="content-area"&gt;
+		&lt;main id="main" class="site-main" role="main"&gt;
+
+
+
+&lt;section class="error-404 not-found"&gt;
+
+
+&lt;header class="page-header"&gt;
+
+
+&lt;h1 class="page-title"&gt;&lt;?php _e( 'Oops! That page can&amp;rsquo;t be found.', 'twentyfifteen' ); ?&gt;&lt;/h1&gt;
+
+
+				&lt;/header&gt;
+
+
+&lt;!-- .page-header --&gt;
+
+
+
+&lt;div class="page-content"&gt;
+
+
+&lt;?php _e( 'It looks like nothing was found at this location. Maybe try a search?', 'twentyfifteen' ); ?&gt;
+
+
+					&lt;?php get_search_form(); ?&gt;
+				&lt;/div&gt;
+
+
+&lt;!-- .page-content --&gt;
+			&lt;/section&gt;
+
+
+&lt;!-- .error-404 --&gt;
+
+		&lt;/main&gt;&lt;!-- .site-main --&gt;
+	&lt;/div&gt;
+
+
+&lt;!-- .content-area --&gt;
+
+&lt;?php get_footer(); ?&gt;
+
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="comments-php" tabindex="-1">Comments.php <a href="#comments-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Comments.php</span></a></h2>
+<p>The <code>comments.php</code> file handles exactly what you would expect, comments. This is a partial template that is pulled into other template files to display comments that users leave on a page or post. Several different pages and posts show comments so it makes sense to have one file that can be pulled in when needed.</p>
+<p>The code involved in creating comments is expanded upon on the <a href="https://developer.wordpress.org/themes/template-files-section/partial-and-miscellaneous-template-files/comments/">comment template page</a>.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="sidebar-php" tabindex="-1">Sidebar.php <a href="#sidebar-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Sidebar.php</span></a></h2>
+<p>A lot of themes utilize sidebars to display widgets. &nbsp;For a sidebar to work in a theme it must be registered and then a template file for the sidebar must be created. &nbsp;You’ll learn more about <a href="https://developer.wordpress.org/themes/functionality/sidebars/">registering sidebars</a> in a later chapter. Sidebar files often have conditional statements and the <code>is_active_sidebar( 'sidebar-name' )</code> function in them to ensure&nbsp;a widget is in use within the sidebar so that empty HTML isn’t added to a page unnecessarily.</p>
+<p>Here is an example of a sidebar template file from the twenty fifteen theme. Notice at the bottom the sidebar is pulled in using <code>&lt;?php dynamic_sidebar( 'sidebar-1' ); &gt;</code>. Now whatever, widgets are put into that sidebar will display on the page that is using this pulling in this template.</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">
+if ( has_nav_menu( 'primary' ) || has_nav_menu( 'social' ) || is_active_sidebar( 'sidebar-1' ) ) : &gt;
+ 
+
+
+
+&lt;div id="secondary" class="secondary"&amp;gt; 
+
+    &lt;?php if ( is_active_sidebar( 'sidebar-1' ) ) : &gt;
+ 
+
+
+
+&lt;div id="widget-area" class="widget-area" role="complementary"&amp;gt;
+            &lt;?php dynamic_sidebar( 'sidebar-1' ); &gt;
+        &lt;/div&amp;gt;
+
+ 
+    &lt;!-- .widget-area --&amp;gt;
+    &lt;?php endif; &gt;
+ 
+&lt;/div&amp;gt;
+
+ 
+&lt;!-- .secondary --&amp;gt;
+ 
+&lt;?php endif; &gt;
+
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="content-slug-php" tabindex="-1">Content-{$slug}.php <a href="#content-slug-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Content-{$slug}.php</span></a></h2>
+<p>Many theme developers break their template files into small bite sized pieces. &nbsp;They’ll often put wrappers and page architecture elements in template files like <code>page.php, home.php, comments.php</code> etc but then they put the code displaying the content of those pages in another template file. Enter <code>content-{$slug}.php</code>: common examples would be <code>content-page.php, content-post.php, content-portfolio.php, content-none.php</code>. &nbsp;These are not file names that WordPress recognizes and will interpret a certain way, rather they are a common approach to display specific types of content.</p>
+<p>For example, often on blog posts you want to display the author’s name, the date of the post, and possibly the category of the post. &nbsp;You’d also likely have links to previous and next posts. That information wouldn’t be appropriate on a regular page. Similarly on a portfolio page you would likely have a featured image or gallery you would want to display in a way differently than say a blog post’s or page’s featured images.</p>
+<p>You’ll want to use the <code>get_template_part()</code> <a href="https://developer.wordpress.org/themes/basics/template-tags/">template tag</a>&nbsp;to pull in the <code>content-{$slug}.php</code> file. To pull in your <code>content-page.php</code> file you would call <code>get_template_part( 'content', 'page' );</code></p>
+<p>Here is twenty fifteen’s example of a <code>content-page.php</code> template file.</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">
+
+&lt;article id="post-&lt;?php the_ID(); ?&gt;" &lt;?php post_class(); ?&gt;&gt;
+	&lt;?php // Post thumbnail. twentyfifteen_post_thumbnail(); ?&gt;
+
+
+
+&lt;header class="entry-header"&gt;
+		&lt;?php the_title( '
+
+&lt;h1 class="entry-title"&gt;', '&lt;/h1&gt;
+
+
+' ); ?&gt;
+	&lt;/header&gt;
+
+
+&lt;!-- .entry-header --&gt;
+
+
+
+&lt;div class="entry-content"&gt;
+		&lt;?php the_content(); ?&gt;
+		&lt;?php wp_link_pages( array( 'before' =&gt; '
+
+&lt;div class="page-links"&gt;&lt;span class="page-links-title"&gt;' . __( 'Pages:', 'twentyfifteen' ) . '&lt;/span&gt;',
+				'after'       =&gt; '&lt;/div&gt;
+
+
+',
+				'link_before' =&gt; '&lt;span&gt;',
+				'link_after'  =&gt; '&lt;/span&gt;',
+				'pagelink'    =&gt; '&lt;span class="screen-reader-text"&gt;' . __( 'Page', 'twentyfifteen' ) . ' &lt;/span&gt;%',
+				'separator'   =&gt; '&lt;span class="screen-reader-text"&gt;, &lt;/span&gt;',
+			) );
+		?&gt;
+	&lt;/div&gt;
+
+
+&lt;!-- .entry-content --&gt;
+
+	&lt;?php edit_post_link( __( 'Edit', 'twentyfifteen' ), '
+
+&lt;footer class="entry-footer"&gt;&lt;span class="edit-link"&gt;', '&lt;/span&gt;&lt;/footer&gt;
+
+
+&lt;!-- .entry-footer --&gt;' ); ?&gt;
+
+&lt;/article&gt;
+
+
+&lt;!-- #post-## --&gt;
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+		
+    </main>
+    <main id="main" class="site-main post-11356 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>Comment Template</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#simple-comments-loop">Simple comments loop</a></li>
+<li><a href="#another-comments-php-example">Another Comments.php Example</a></li>
+<li><a href="#breaking-down-the-comments-php">Breaking down the comments.php</a>
+<ul>
+<li><a href="#template-header">Template Header </a></li>
+<li><a href="#comments-title">Comments Title </a></li>
+<li><a href="#comment-listing">Comment Listing</a></li>
+<li><a href="#comment-pagination">Comment Pagination</a></li>
+<li><a href="#comments-are-closed-message">Comments are closed message.</a></li>
+<li><a href="#the-end">The End</a>
+</li></ul></li>
+<li><a href="#comments-pagination">Comments Pagination </a></li>
+<li><a href="#alternative-comment-template">Alternative Comment Template</a></li>
+<li><a href="#function-reference">Function Reference  </a></li>
+<li><a href="#functions-reference-for-retrieving-comments-meta">Functions reference for retrieving comments meta  </a></li></ul>
+</div>
+<p>WordPress displays comments in your theme based on the settings and code in the <code>comments.php</code> file within your WordPress theme.</p>
+<h2 class="toc-heading" id="simple-comments-loop" tabindex="-1">Simple comments loop <a href="#simple-comments-loop" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Simple comments loop</span></a></h2>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php
+//Get only the approved comments 
+$args = array(
+    'status' =&gt; 'approve'
+);
+
+// The comment Query
+$comments_query = new WP_Comment_Query;
+$comments = $comments_query-&gt;query( $args );
+
+// Comment Loop
+if ( $comments ) {
+	foreach ( $comments as $comment ) {
+		echo '&lt;p&gt;' . $comment-&gt;comment_content . '&lt;/p&gt;';
+	}
+} else {
+	echo 'No comments found.';
+}
+?&gt;
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p>The <code>comments.php</code> template contains all the logic needed to pull comments out of the database and display them in your theme.</p>
+<p>Before we explore the template file you’ll want to know how to pull in the partial template file on the appropriate pages such as <code>single.php</code>. You’ll wrap the comment <a href="https://developer.wordpress.org/themes/basics/template-tags/">template tag</a> in a conditional statement so comments.php is only pulled in if it makes sense to do.</p>
+<pre class="brush: php; title: ; notranslate" title="">// If comments are open or we have at least one comment, load up the comment template.
+ if ( comments_open() || get_comments_number() ) :
+     comments_template();
+ endif;
+</pre>
+<p><img class=" size-full wp-image-11358 alignleft" src="https://developer.wordpress.org/files/2014/10/functionality-comments-01.png" alt="functionality-comments-01" width="350" height="257" srcset="https://developer.wordpress.org/files/2014/10/functionality-comments-01.png 350w, https://developer.wordpress.org/files/2014/10/functionality-comments-01-300x220.png 300w" sizes="(max-width: 350px) 100vw, 350px"></p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="another-comments-php-example" tabindex="-1">Another Comments.php Example <a href="#another-comments-php-example" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Another Comments.php Example</span></a></h2>
+<p>Here’s an example of the <code>comments.php</code> template included with the Twenty Thirteen theme:</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php
+/**
+ * The template for displaying Comments.
+ *
+ * The area of the page that contains comments and the comment form.
+ *
+ * @package WordPress
+ * @subpackage Twenty_Thirteen
+ * @since Twenty Thirteen 1.0
+ */
+
+/*
+ * If the current post is protected by a password and the visitor has not yet
+ * entered the password we will return early without loading the comments.
+ */
+if ( post_password_required() )
+	return;
+?&gt;
+
+&lt;div id="comments" class="comments-area"&gt;
+
+	&lt;?php if ( have_comments() ) : ?&gt;
+		&lt;h2 class="comments-title"&gt;
+			&lt;?php
+				printf( _nx( 'One thought on "%2$s"', '%1$s thoughts on "%2$s"', get_comments_number(), 'comments title', 'twentythirteen' ),
+					number_format_i18n( get_comments_number() ), '&lt;span&gt;' . get_the_title() . '&lt;/span&gt;' );
+			?&gt;
+		&lt;/h2&gt;
+
+		&lt;ol class="comment-list"&gt;
+			&lt;?php
+				wp_list_comments( array(
+					'style'       =&gt; 'ol',
+					'short_ping'  =&gt; true,
+					'avatar_size' =&gt; 74,
+				) );
+			?&gt;
+		&lt;/ol&gt;&lt;!-- .comment-list --&gt;
+
+		&lt;?php
+			// Are there comments to navigate through?
+			if ( get_comment_pages_count() &gt; 1 &amp;&amp; get_option( 'page_comments' ) ) :
+		?&gt;
+		&lt;nav class="navigation comment-navigation" role="navigation"&gt;
+			&lt;h1 class="screen-reader-text section-heading"&gt;&lt;?php _e( 'Comment navigation', 'twentythirteen' ); ?&gt;&lt;/h1&gt;
+			&lt;div class="nav-previous"&gt;&lt;?php previous_comments_link( __( '&amp;larr; Older Comments', 'twentythirteen' ) ); ?&gt;&lt;/div&gt;
+			&lt;div class="nav-next"&gt;&lt;?php next_comments_link( __( 'Newer Comments &amp;rarr;', 'twentythirteen' ) ); ?&gt;&lt;/div&gt;
+		&lt;/nav&gt;&lt;!-- .comment-navigation --&gt;
+		&lt;?php endif; // Check for comment navigation ?&gt;
+
+		&lt;?php if ( ! comments_open() &amp;&amp; get_comments_number() ) : ?&gt;
+		&lt;p class="no-comments"&gt;&lt;?php _e( 'Comments are closed.' , 'twentythirteen' ); ?&gt;&lt;/p&gt;
+		&lt;?php endif; ?&gt;
+
+	&lt;?php endif; // have_comments() ?&gt;
+
+	&lt;?php comment_form(); ?&gt;
+
+&lt;/div&gt;&lt;!-- #comments --&gt;
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="breaking-down-the-comments-php" tabindex="-1">Breaking down the comments.php <a href="#breaking-down-the-comments-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Breaking down the comments.php</span></a></h2>
+<p>The above <code>comments.php</code> can be broken down to the below parts for better understanding.</p>
+<ol>
+<li> <a href="#template-header">Template Header</a></li>
+<li><a href="#comments-title">Comments Title</a></li>
+<li><a href="#comment-listing">Comment Listing</a></li>
+<li><a href="#comment-pagination">Comment Pagination</a></li>
+<li><a href="#comments-are-closed-message">Comments are closed message</a>.</li>
+<li><a href="#the-end">The End</a></li>
+</ol>
+<h3 class="toc-heading" id="template-header" tabindex="-1">Template Header  <a href="#template-header" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Template Header </span></a></h3>
+<p>This template begins by identifying the template.</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php
+/**
+ * The template for displaying Comments.
+ *
+ * The area of the page that contains comments and the comment form.
+ *
+ * @package WordPress
+ * @subpackage Twenty_Thirteen
+ * @since Twenty Thirteen 1.0
+ */
+</pre>
+<p>Next, there’s a test to see if the post is password protected and, if so, it stops processing the template.</p>
+<pre class="brush: php; title: ; notranslate" title="">/*
+ * If the current post is protected by a password and the visitor has not yet
+ * entered the password we will return early without loading the comments.
+ */
+if ( post_password_required() )
+	return;
+?&gt;
+</pre>
+<p>Finally, there’s a test to see if there are comments associated with this post.</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;div id="comments" class="comments-area"&gt;
+
+	&lt;?php if ( have_comments() ) : ?&gt;
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="comments-title" tabindex="-1">Comments Title  <a href="#comments-title" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Comments Title </span></a></h3>
+<p>Prints out the header that appears above the comments.</p>
+<div class="callout callout-info"><p><span class="screen-reader-text">Note:</span> Uses the <a href="https://developer.wordpress.org/reference/functions/_nx/">_nx()</a> translation function so other developers can provide alternative language translations.</p>
+</div>
+<pre class="brush: php; title: ; notranslate" title="">		&lt;h2 class="comments-title"&gt;
+			&lt;?php
+				printf( _nx( 'One thought on "%2$s"', '%1$s thoughts on "%2$s"', get_comments_number(), 'comments title', 'twentythirteen' ),
+					number_format_i18n( get_comments_number() ), '&lt;span&gt;' . get_the_title() . '&lt;/span&gt;' );
+			?&gt;
+		&lt;/h2&gt;
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="comment-listing" tabindex="-1">Comment Listing <a href="#comment-listing" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Comment Listing</span></a></h3>
+<p>The following snippet creates an ordered listing of comments using the <a href="https://developer.wordpress.org/reference/functions/wp_list_comments/">wp_list_comments()</a>  function.</p>
+<pre class="brush: php; title: ; notranslate" title="">		&lt;ol class="comment-list"&gt;
+			&lt;?php
+				wp_list_comments( array(
+					'style'       =&gt; 'ol',
+					'short_ping'  =&gt; true,
+					'avatar_size' =&gt; 74,
+				) );
+			?&gt;
+		&lt;/ol&gt;&lt;!-- .comment-list --&gt;
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="comment-pagination" tabindex="-1">Comment Pagination <a href="#comment-pagination" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Comment Pagination</span></a></h3>
+<p>Checks to see if there are enough comments to merit adding comment navigation and, if so, create comment navigation.</p>
+<pre class="brush: php; title: ; notranslate" title="">		&lt;?php
+			// Are there comments to navigate through?
+			if ( get_comment_pages_count() &gt; 1 &amp;&amp; get_option( 'page_comments' ) ) :
+		?&gt;
+		&lt;nav class="navigation comment-navigation" role="navigation"&gt;
+			&lt;h1 class="screen-reader-text section-heading"&gt;&lt;?php _e( 'Comment navigation', 'twentythirteen' ); ?&gt;&lt;/h1&gt;
+			&lt;div class="nav-previous"&gt;&lt;?php previous_comments_link( __( '&amp;larr; Older Comments', 'twentythirteen' ) ); ?&gt;&lt;/div&gt;
+			&lt;div class="nav-next"&gt;&lt;?php next_comments_link( __( 'Newer Comments &amp;rarr;', 'twentythirteen' ) ); ?&gt;&lt;/div&gt;
+		&lt;/nav&gt;&lt;!-- .comment-navigation --&gt;
+		&lt;?php endif; // Check for comment navigation ?&gt;
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="comments-are-closed-message" tabindex="-1">Comments are closed message. <a href="#comments-are-closed-message" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Comments are closed message.</span></a></h3>
+<p>If comments aren’t open, displays a line indicating that they’re closed.</p>
+<pre class="brush: php; title: ; notranslate" title="">		&lt;?php if ( ! comments_open() &amp;&amp; get_comments_number() ) : ?&gt;
+		&lt;p class="no-comments"&gt;&lt;?php _e( 'Comments are closed.' , 'twentythirteen' ); ?&gt;&lt;/p&gt;
+		&lt;?php endif; ?&gt;
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="the-end" tabindex="-1">The End <a href="#the-end" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">The End</span></a></h3>
+<p>This section ends the comments loop, includes the comment form, and closes the comment wrapper.</p>
+<pre class="brush: php; title: ; notranslate" title="">	&lt;?php endif; // have_comments() ?&gt;
+
+	&lt;?php comment_form(); ?&gt;
+
+&lt;/div&gt;&lt;!-- #comments --&gt;
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="comments-pagination" tabindex="-1">Comments Pagination  <a href="#comments-pagination" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Comments Pagination </span></a></h2>
+<p>If you have a lot of comments (which makes your page long), then there are a number of potential benefits to paginating your comments. Pagination helps improve page load speed, especially on mobile devices.<br>
+Enabling comments pagination is done in two steps.</p>
+<ol>
+<li>Enable paged comments within WordPress by going to <em>Settings</em> &gt;<em> Discussion </em>, and checking the box   “<em>Break comments into pages</em>” . You can enter any number for the “<em>top level comments per page</em>”. </li>
+<li>Open your <code>comments.php</code> template file and add the following line where you want the comment pagination to appear. </li>
+</ol>
+<pre class="brush: php; title: ; notranslate" title="">&lt;div class="pagination"&gt;
+    &lt;?php paginate_comments_links(); ?&gt;
+&lt;/div&gt;
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="alternative-comment-template" tabindex="-1">Alternative Comment Template <a href="#alternative-comment-template" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Alternative Comment Template</span></a></h2>
+<p>On some occasions you may want display your comments differently within your theme. For this you would build an alternate file (ex. short-comments.php) and call it as follows:</p>
+<pre class="brush: php; title: ; notranslate" title=""> &lt;?php comments_template( '/short-comments.php' ); ?&gt; </pre>
+<p>The path to the file used for an alternative comments template should be relative to the current theme root directory, and include any subfolders. So if the custom comments template is in a folder inside the theme, it may look like this when called:</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php comments_template( '/custom-templates/alternative-comments.php' ); ?&gt; </pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="function-reference" tabindex="-1">Function Reference   <a href="#function-reference" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Function Reference  </span></a></h2>
+<ul>
+<li><a href="https://developer.wordpress.org/reference/functions/wp_list_comments/">wp_list_comments()</a> : Displays all comments for a post or Page based on a variety of parameters including ones set in the administration area.</li>
+<li><a href="https://developer.wordpress.org/reference/functions/comment_form/">comment_form()</a> : This tag outputs a complete commenting form for use within a template.</li>
+<li><a href="https://developer.wordpress.org/reference/functions/comments_template/">comments_template()</a> : Load the comment template specified in first argument</li>
+<li><a href="https://developer.wordpress.org/reference/functions/paginate_comments_links/">paginate_comments_links()</a> : Create pagination links for the comments on the current post.</li>
+<li><a href="https://developer.wordpress.org/reference/functions/get_comments/">get_comments()</a> : Retrieve the comments with possible use of arguments</li>
+<li><a href="https://developer.wordpress.org/reference/functions/get_approved_comments/">get_approved_comments()</a> : Retrieve the approved comments for post id provided.</li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="functions-reference-for-retrieving-comments-meta" tabindex="-1">Functions reference for retrieving comments meta   <a href="#functions-reference-for-retrieving-comments-meta" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Functions reference for retrieving comments meta  </span></a></h2>
+<ul>
+<li><a href="https://developer.wordpress.org/reference/functions/get_comment_link/">get_comment_link()</a> </li>
+<li><a href="https://developer.wordpress.org/reference/functions/get_comment_author/">get_comment_author()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/get_comment_date/">get_comment_date()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/get_comment_time/">get_comment_time()</a></li>
+<li><a href="https://developer.wordpress.org/reference/functions/get_comment_text/">get_comment_text()</a></li>
+</ul>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+		
+    </main>
+    <main id="main" class="site-main post-11341 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>Taxonomy Templates</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#taxonomy-template-hierarchy">Taxonomy Template Hierarchy</a>
+<ul>
+<li><a href="#category">Category</a></li>
+<li><a href="#tag">Tag</a></li>
+<li><a href="#custom-taxonomy">Custom Taxonomy</a>
+</li></ul></li>
+<li><a href="#creating-taxonomy-template-files">Creating Taxonomy Template Files</a></li>
+<li><a href="#examples">Examples</a>
+<ul>
+<li><a href="#adding-text-to-category-pages">Adding Text to Category Pages</a>
+<ul>
+<li><a href="#static-text-above-posts">Static Text Above Posts</a></li>
+<li><a href="#different-text-on-some-category-pages">Different Text on Some Category Pages</a></li>
+<li><a href="#display-text-only-on-first-page-of-archive">Display Text only on First Page of Archive</a>
+</li></ul></li>
+<li><a href="#modify-how-posts-are-displayed">Modify How Posts are Displayed</a>
+<ul>
+<li><a href="#excerpts-vs-full-posts">Excerpts vs. Full Posts</a></li></ul>
+</li></ul></li></ul></div>
+<p>When a visitor clicks on a hyperlink to category, tag or custom taxonomy, WordPress displays a page of posts in reverse chronological order filtered by that taxonomy.</p>
+<p>By default, this page is generated using the <em>index.php</em> template file. You can create optional template files to override and refine the <em>index.php</em> template files. This section explains how to use and create such templates.</p>
+<h2 class="toc-heading" id="taxonomy-template-hierarchy" tabindex="-1">Taxonomy Template Hierarchy <a href="#taxonomy-template-hierarchy" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Taxonomy Template Hierarchy</span></a></h2>
+<p>WordPress display posts in the order determined by the <a title="Template Hierarchy" href="https://developer.wordpress.org/themes/basics/template-hierarchy/">Template Hierarchy</a>.</p>
+<p>The <em>category.php</em>, <em>tag.php</em>, and <em>taxonomy.php</em> templates allow posts <strong>filtered</strong> by taxonomy to be treated differently from <strong>unfiltered</strong> posts or posts <strong>filtered by a different taxonomy</strong>. (Note: post refers to any post type – posts, pages, custom post types, etc.). These files let you target specific taxonomies or specific taxonomy terms. For example:</p>
+<ul>
+<li><em>taxonomy-{taxonomy}-{term}.php</em></li>
+<li><em>taxonomy-{taxonomy}.php</em></li>
+<li><em>tag-{slug}.php</em></li>
+<li><em>tag-{id}.php</em></li>
+<li><em>category-{slug}.php</em></li>
+<li><em>category-{ID}.php</em></li>
+</ul>
+<p>So you could format all posts in an animal taxonomy named <em>news</em> on a page that looks different from posts filtered in other categories.</p>
+<p>The <em>archive.php</em> template provides the most general form of control, providing a layout for all archives; that is, a page that displays a list of posts.</p>
+<h3 class="toc-heading" id="category" tabindex="-1">Category <a href="#category" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Category</span></a></h3>
+<p>For categories, WordPress looks for the <em>category-{slug}.php</em> file. If it doesn’t exist, WordPress then looks for a file for the next hierarchical level, <em>category-{ID}.php</em>, and so on. If WordPress fails to find any specialized templates or an <em>archive.php</em> template file, it reverts to the default behavior, using <em>index.php</em>.</p>
+<p>The category hierarchy is listed below:</p>
+<ol>
+<li><em>category-{slug}.php</em>: For example, if the category’s slug is named “news,” WordPress would look for a file named <em>category-news.php.</em></li>
+<li><em>category-{ID}.php</em>: For example, if the category’s ID is “6”, WordPress would look for a file named <em>category-6.php.</em></li>
+<li><em>category.php</em></li>
+<li><em>archive.php</em></li>
+<li><em>index.php</em></li>
+</ol>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="tag" tabindex="-1">Tag <a href="#tag" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Tag</span></a></h3>
+<p>For tags, WordPress looks for the <em>tag-{slug}.php</em> file. If it doesn’t exist, WordPress then looks for a file for the next hierarchical level, <em>tag-{ID}.php</em>, and so on. If WordPress fails to find any specialized templates or an <em>archive.php</em> template file, it will revert to the default behavior, using <em>index.php</em>.</p>
+<p>The tag hierarchy is listed below:</p>
+<ol>
+<li><em>tag-{slug}.php</em>: For example, if the tag’s slug is named “sometag,” WordPress would look for a file named <em>tag-sometag.php.</em></li>
+<li><em>tag-{id}.php</em>: For example, if the tag’s ID were “6,” WordPress would look for a file named <em>tag-6.php</em>.</li>
+<li><em>tag.php</em></li>
+<li><em>archive.php</em></li>
+<li><em>index.php</em></li>
+</ol>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="custom-taxonomy" tabindex="-1">Custom Taxonomy <a href="#custom-taxonomy" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Custom Taxonomy</span></a></h3>
+<p>A custom taxonomy hierarchy works similarly to the categories and tags hierarchies described above. WordPress looks for the <em>taxonomy-{taxonomy}-{term}.php</em> file. If it doesn’t exist, WordPress then looks for a file for the next hierarchical level, <em>taxonomy-{taxonomy}.php</em>, and so on. If WordPress fails to find any specialized templates or an <em>archive.php</em> template file, it will revert to the default behavior, using <em>index.php</em>.</p>
+<p>The hierarchy for a custom taxonomy is listed below:</p>
+<ol>
+<li><em>taxonomy-{taxonomy}-{term}.php</em>: For example, if the taxonomy is named “sometax,” and the taxonomy’s term is “someterm,” WordPress would look for a file named <em>taxonomy-sometax-someterm.php</em>.</li>
+<li><em>taxonomy-{taxonomy}.php</em>: For example, if the taxonomy is named “sometax,” WordPress would look for a file named <em>taxonomy-sometax.php</em></li>
+<li><em>taxonomy.php</em></li>
+<li><em>archive.php</em></li>
+<li><em>index.php</em></li>
+</ol>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="creating-taxonomy-template-files" tabindex="-1">Creating Taxonomy Template Files <a href="#creating-taxonomy-template-files" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Creating Taxonomy Template Files</span></a></h2>
+<p>Now you’ve decided that you need to create custom designs for content based on taxonomies, where do you start?</p>
+<p>Rather than starting from a blank file, it is good practice to <strong>copy the next file in the hierarchy</strong>, if it exists. If you’ve already created an <em>archive.php</em>, make a copy called <em>category.php</em> and modify that to suit your design needs. If you don’t have an <em>archive.php</em> file, use a copy of your theme’s <em>index.php</em> as a starting point.</p>
+<p>Follow the same procedure if you are creating any taxonomy template file. Use a copy of your <em>archive.php</em>, <em>category.php</em>, <em>tag.php</em>, or <em>index.php</em> as a starting point.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="examples" tabindex="-1">Examples <a href="#examples" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Examples</span></a></h2>
+<p>Now that you’ve selected the template file in your theme’s directory that you need to modify, let’s look at some examples.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="adding-text-to-category-pages" tabindex="-1">Adding Text to Category Pages <a href="#adding-text-to-category-pages" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Adding Text to Category Pages</span></a></h3>
+<h4 class="toc-heading" id="static-text-above-posts" tabindex="-1">Static Text Above Posts <a href="#static-text-above-posts" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Static Text Above Posts</span></a></h4>
+<p>Suppose you want some static text displayed before the list of posts on your category page(s). “Static” is text that remains the same, no matter which posts are displayed below, and no matter which category is displayed.</p>
+<p>Open your file and above <a title="The Loop" href="https://developer.wordpress.org/themes/basics/the-loop/">The Loop</a> section of your Template file, insert the following code:</p>
+<pre class="brush: xml; title: ; notranslate" title="">
+&lt;p&gt;
+This is some text that will display at the top of the Category page.
+&lt;/p&gt;
+
+</pre>
+<p>This text will only display on an archive page displaying posts in that category.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h4 class="toc-heading" id="different-text-on-some-category-pages" tabindex="-1">Different Text on Some Category Pages <a href="#different-text-on-some-category-pages" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Different Text on Some Category Pages</span></a></h4>
+<p>What if you want to display different text based on the category page that the visitor is using? You could add default text to the main <em>category.php</em> file, and create special <em>category-{slug}.php</em> files each with their own version of the text, but this would create lots of files in your theme. Instead, you can use <a title="Conditional Tags" href="https://developer.wordpress.org/themes/basics/conditional-tags/">conditional tags</a>.</p>
+<p>Again, this code would be added before the loop:</p>
+<pre class="brush: php; title: ; notranslate" title="">
+&lt;?php if (is_category('Category A')) : ?&gt;
+      &lt;p&gt;This is the text to describe category A&lt;/p&gt;
+&lt;?php elseif (is_category('Category B')) : ?&gt;
+      &lt;p&gt;This is the text to describe category B&lt;/p&gt;
+&lt;?php else : ?&gt;
+      &lt;p&gt;This is some generic text to describe all other category pages,
+I could be left blank&lt;/p&gt;
+&lt;?php endif; ?&gt;
+
+</pre>
+<p>This code does the following:</p>
+<ol>
+<li>Checks to see if the visitor has requested Category A. If yes, it displays the first piece of text.</li>
+<li>Checks for category B if the user didn’t request category A. If yes, it displays the second piece of text.</li>
+<li>Displays the default text, if neither was requested.</li>
+</ol>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h4 class="toc-heading" id="display-text-only-on-first-page-of-archive" tabindex="-1">Display Text only on First Page of Archive <a href="#display-text-only-on-first-page-of-archive" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Display Text only on First Page of Archive</span></a></h4>
+<p>If you have more posts than fits on one page of your archive, the category splits into multiple pages. Perhaps you want to display static text, if the user is on the first page of the results.</p>
+<p>To do this, use a PHP if statement that looks at the value of the $paged WordPress variable.</p>
+<p>Put the following above The Loop:</p>
+<pre class="brush: php; title: ; notranslate" title="">
+&lt;?php if ( $paged &lt; 2 ) : ?&gt;
+      &lt;p&gt;Text for first page of Category archive.&lt;/p&gt;
+&lt;?php else : ?&gt;
+&lt;?php endif; ?&gt;
+
+</pre>
+<p>This code asks whether the page displayed is the first page of the archive. If it is, the text for the first page is displayed. Otherwise, the text for the subsequent pages is displayed.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="modify-how-posts-are-displayed" tabindex="-1">Modify How Posts are Displayed <a href="#modify-how-posts-are-displayed" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Modify How Posts are Displayed</span></a></h3>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h4 class="toc-heading" id="excerpts-vs-full-posts" tabindex="-1">Excerpts vs. Full Posts <a href="#excerpts-vs-full-posts" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Excerpts vs. Full Posts</span></a></h4>
+<p>You can choose whether to display full posts or just excerpts. By displaying excerpts, you shorten the length of your archive page.</p>
+<p>Open your file and find the loop. Look for:</p>
+<pre class="brush: php; title: ; notranslate" title="">the_content()
+</pre>
+<p>And replace it with:</p>
+<pre class="brush: php; title: ; notranslate" title="">the_excerpt()
+</pre>
+<p>And if your theme is displaying excerpts but you want to display the full content, replace <code>the_excerpt</code> with <code>the_content</code>.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+		
+    </main>
+    <main id="main" class="site-main post-11382 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>404 Pages</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#creating-the-404-php-file">Creating the 404.php file</a></li>
+<li><a href="#add-a-file-header">Add a file header</a></li>
+<li><a href="#adding-the-body-to-your-404-page">Adding the body to your 404 Page</a></li>
+<li><a href="#adding-the-footer-and-sidebar">Adding the footer and sidebar.</a></li></ul>
+</div>
+<p>A 404 page is important to add into your theme in case a user stumbles upon a page that doesn’t exist or hasn’t been created yet. It is also important that your 404 page gives your visitors a way to arrive at the right place.</p>
+<p>These next few steps will help you build a useful 404 page for your WordPress theme.</p>
+<h2 class="toc-heading" id="creating-the-404-php-file" tabindex="-1">Creating the 404.php file <a href="#creating-the-404-php-file" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Creating the 404.php file</span></a></h2>
+<p>As the <code>404.php</code> file is used on a page not found error, the first step is to create a file named <code>404.php</code> and add it to your WordPress theme folder.</p>
+<div class="callout callout-tip"><p><span class="screen-reader-text">Tip:</span> Often times a great starting point for your <code>404.php</code> is your <code>index.php</code></p>
+</div>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="add-a-file-header" tabindex="-1">Add a file header <a href="#add-a-file-header" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Add a file header</span></a></h2>
+<p>To use your theme’s <code>header.php</code> file, open your <code>404.php</code> file. At the top, add a comment describing what the file is and make sure you include your theme’s header.</p>
+<p>For example:</p>
+<pre class="brush: php; title: ; notranslate" title="">/**
+ * The template for displaying 404 pages (Not Found)
+ */
+get_header();
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="adding-the-body-to-your-404-page" tabindex="-1">Adding the body to your 404 Page <a href="#adding-the-body-to-your-404-page" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Adding the body to your 404 Page</span></a></h2>
+<p>To make the 404 page functional you have to add the body content to your template:</p>
+<p>Example:</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">&lt;div id="primary" class="content-area"&gt;
+		&lt;div id="content" class="site-content" role="main"&gt;
+
+			&lt;header class="page-header"&gt;
+				&lt;h1 class="page-title"&gt;&lt;?php _e( 'Not Found', 'twentythirteen' ); ?&gt;&lt;/h1&gt;
+			&lt;/header&gt;
+
+			&lt;div class="page-wrapper"&gt;
+				&lt;div class="page-content"&gt;
+					&lt;h2&gt;&lt;?php _e( 'This is somewhat embarrassing, isn’t it?', 'twentythirteen' ); ?&gt;&lt;/h2&gt;
+					&lt;p&gt;&lt;?php _e( 'It looks like nothing was found at this location. Maybe try a search?', 'twentythirteen' ); ?&gt;&lt;/p&gt;
+
+					&lt;?php get_search_form(); ?&gt;
+				&lt;/div&gt;&lt;!-- .page-content --&gt;
+			&lt;/div&gt;&lt;!-- .page-wrapper --&gt;
+
+		&lt;/div&gt;&lt;!-- #content --&gt;
+	&lt;/div&gt;&lt;!-- #primary --&gt;
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p>This example is from the Twenty Thirteen theme that comes with WordPress. This adds some text and a search form in the 404 page.</p>
+<div class="callout callout-info"><p><span class="screen-reader-text">Note:</span> You can to add your own text to make your 404 page look better.</p>
+</div>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="adding-the-footer-and-sidebar" tabindex="-1">Adding the footer and sidebar. <a href="#adding-the-footer-and-sidebar" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Adding the footer and sidebar.</span></a></h2>
+<p>The final step when creating a 404 page is to add the footer. You may also add a sidebar if you want.</p>
+<p>Example:</p>
+<pre class="brush: php; title: ; notranslate" title="">get_sidebar();
+get_footer();
+</pre>
+<p>Now you have a functional 404 page with a search form and some text in case a user stumbles upon the wrong page. Once you make sure the <code>404.php</code> has been uploaded, you can test your 404 page. Just type a URL address for your website that doesn’t exist. You can try something like <code>http://example.com/fred.php</code>. This is sure to result in a 404 error unless you actually have a PHP file called <code>fred.php<code>.</code></code></p>
+<p>&nbsp;</p>
+
+<div class="bottom-of-entry">&nbsp;</div>
+		
+</main>

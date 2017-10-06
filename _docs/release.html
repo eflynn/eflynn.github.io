@@ -1,0 +1,206 @@
+---
+title: Releasing Your Theme
+permalink: /release/
+order: 8
+---
+
+<main id="main" class="site-main post-5823 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+<h1>Releasing Your Theme</h1>
+
+<p>This section covers the&nbsp;requirements and submission process&nbsp;for releasing your theme into the <a href="https://wordpress.org/themes/">WordPress Theme Directory</a>. If you’ve followed the instructions&nbsp;in this handbook, your theme is almost ready for release into the directory.</p>
+<p>The first requirement to releasing your theme is to make sure you have – at minimum – the <a href="https://developer.wordpress.org/themes/release/required-theme-files/">required theme&nbsp;files</a> before submitting your theme for review.</p>
+<p>Once you’ve confirmed the required theme files, thorough <a href="https://developer.wordpress.org/themes/release/testing/">testing</a> of the theme – including content – must be completed.&nbsp;Following the <a href="https://developer.wordpress.org/themes/release/theme-review-guidelines/">theme review guidelines</a> will help ensure acceptance of your&nbsp;theme.</p>
+<p>After completing everything&nbsp;above, having the proper <a href="https://developer.wordpress.org/themes/release/writing-documentation/">documentation</a> is the final step before <a href="https://developer.wordpress.org/themes/release/submitting-your-theme-to-wordpress-org/">submitting your theme for approval</a>. After submitting your theme for review, the theme reviewer may request other changes to your theme.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+</main>
+
+<main id="main" class="site-main theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+      
+<h1>Required Theme Files</h1>
+
+<p>Before you submit your theme for review, you must make sure that certain files are included. These files must follow template file standards&nbsp;set by&nbsp;the Theme Review Team. In addition to the files below, there are several other standard template files that we recommend you use, as discussed on the&nbsp;<a href="https://developer.wordpress.org/themes/basics/organizing-theme-files/">Organizing Theme Files</a>&nbsp;page.</p>
+<h2>Required Theme&nbsp;Files</h2>
+<ol>
+<li><strong>style.css<br>
+</strong>Your theme’s main <a href="https://developer.wordpress.org/themes/basics/including-css-javascript/">stylesheet</a> file. This file will also include information about your theme, such as author name, version number, and plugin URL, in it’s header.</li>
+<li><strong>index.php<br>
+</strong>The main <a href="https://developer.wordpress.org/themes/basics/page-templates/">template file</a> for your theme. This will be the template for the homepage on your site unless a static front page is specified. If you <em>only</em> include this template file, it must include all functionality of your theme. However, you can use as many relevant template files as you want in your theme.</li>
+<li><strong><strong>comments.php<br>
+</strong></strong>The comment template which is included wherever comments are allowed. This file should provide support for threaded comments&nbsp;and&nbsp;trackbacks, and should style author comments differently then user comments. See the <a href="https://developer.wordpress.org/themes/functionality/comments/">Comments</a> page for more information.</li>
+<li><strong>screenshot.png</strong><br>
+In the WordPress.org theme directory, screenshot.png acts as a visual indicator of what your theme looks like. It is visible both in the web view and in the admin dashboard. Note: this screenshot can be no larger than 1200x900px.</li>
+</ol>
+<p>While these files are the only files required by the theme review team for acceptance into the WordPress.org theme directory, you may use other template&nbsp;files. Of course, any file mentioned in the tutorial in this handbook may be used in your theme.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+      
+    <nav class="handbook-navigation" role="navigation">
+      <h1 class="screen-reader-text">Handbook navigation</h1>
+      <div class="nav-links">
+
+      <a href="https://developer.wordpress.org/themes/release/" rel="previous"><span class="meta-nav">←</span> Releasing Your Theme</a><a href="https://developer.wordpress.org/themes/release/testing/" rel="next">Testing <span class="meta-nav">→</span></a>
+      </div>
+      <!-- .nav-links -->
+    </nav><!-- .navigation -->
+  
+    
+    </main>
+<main id="main" class="site-main post-11424 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+    
+      
+<h1>Testing</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#theme-unit-test">Theme Unit Test</a></li>
+<li><a href="#wordpress-settings">WordPress Settings</a></li>
+<li><a href="#wordpress-beta-tester">WordPress Beta Tester</a></li>
+<li><a href="#testing-and-debugging-tools">Testing and debugging tools</a>
+<ul>
+<li><a href="#theme-check">Theme Check</a></li>
+<li><a href="#developer">Developer</a></li>
+<li><a href="#debug-bar">Debug Bar</a></li>
+<li><a href="#log-deprecated-notices">Log Deprecated Notices</a></li>
+<li><a href="#browser-testing">Browser testing</a></li>
+<li><a href="#validation">Validation</a></li></ul>
+</li></ul></div>
+<p>If you’ve followed this handbook, you’ll already have a good grasp on the testing required before submitting your theme to the WordPress.org theme directory. If you haven’t, this page will give you a quick refresher.</p>
+<p>Testing is incredibly important before releasing a theme. You&nbsp;maybe have built the most&nbsp;beautiful WordPress theme, but if it breaks when someone tries to&nbsp;comment or insert an image, your theme isn’t ready for real world usage.</p>
+<p>Before testing your theme, make sure you’ve setup a development environment. There are a number of ways to setup your environment, many of which are documented on the <a href="https://developer.wordpress.org/themes/getting-started/setting-up-a-development-environment/">Setting up a Development Environment</a> page.</p>
+<h2 class="toc-heading" id="theme-unit-test" tabindex="-1">Theme Unit Test <a href="#theme-unit-test" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Theme Unit Test</span></a></h2>
+<p>After you’ve setup your development environment, you’ll need test content to test your theme with. While you can create your own test content, the theme review team has created the <a href="https://codex.wordpress.org/Theme_Unit_Test">Theme Unit Test</a>, which includes many different types of content. This will help ensure that your theme works in circumstances you may not have anticipated.</p>
+<p>The Theme Unit Test is a WordPress export file that can be imported into any WordPress installation by using the WordPress Importer. You should import it into your local development environment.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="wordpress-settings" tabindex="-1">WordPress Settings <a href="#wordpress-settings" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">WordPress Settings</span></a></h2>
+<p>Making tweaks and changes to your WordPress installation is another good way to ensure that you’ve built your theme to handle numerous scenarios. Use the following settings to test your theme.</p>
+<p><strong>General</strong><br>
+Set the Site Title to something long and set the Tagline to something even longer. These settings will test how your theme&nbsp;handles edge cases for site titles and taglines.</p>
+<p><strong>Reading</strong><br>
+Set “Blog pages show at most” to 5. This setting will ensure that index/archive pagination is triggered.</p>
+<p><strong>Discussion</strong><br>
+Enable “Threaded Comments” at least 3 levels deep. This setting will facilitate testing of your theme’s comment list styling.</p>
+<p>Enable “Break comments into pages” and set 5 comments per page to test the pagination and styling of comments.</p>
+<p><strong>Media</strong><br>
+Remove the values for the large size of media to test the theme’s&nbsp;<code>$content_width</code> setting.</p>
+<p><strong>Permalinks</strong><br>
+Change the permalink setting a few times to ensure your theme can handle various URL formats.</p>
+<p>For more&nbsp;setup instructions, take a look at the <a href="https://codex.wordpress.org/Theme_Unit_Test#Setup" target="_blank">Theme Unit Test</a> page in the&nbsp;WordPress Codex.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="wordpress-beta-tester" tabindex="-1">WordPress Beta Tester <a href="#wordpress-beta-tester" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">WordPress Beta Tester</span></a></h2>
+<p>WordPress releases happen three times a year. It’s a good idea to test your theme against the next version of WordPress so you can anticipate issues when the next version is released. This can be done easily with the <a href="https://wordpress.org/plugins/wordpress-beta-tester/">WordPress Beta Tester</a> plugin. The plugin&nbsp;makes it easy to&nbsp;download either the latest nightly version of WordPress or the latest branch version (for minor bugfix releases). This is especially useful when anticipating a new major release or developing for an upcoming feature.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="testing-and-debugging-tools" tabindex="-1">Testing and debugging tools <a href="#testing-and-debugging-tools" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Testing and debugging tools</span></a></h2>
+<h3 class="toc-heading" id="theme-check" tabindex="-1">Theme Check <a href="#theme-check" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Theme Check</span></a></h3>
+<p>Each theme goes through an automated check before a reviewer even sees it. If there are any immediate problems with the theme, identified by the automated check, the theme will be rejected with notes on how to resolve the issues. The <a href="https://wordpress.org/plugins/theme-check/">Theme Check</a> plugin adds a dashboard link under Appearance so you can run&nbsp;the exact same checks that WordPress.org does right from your administration panel. Doing this prior to uploading your theme lets you know what needs to be addressed prior to submission. Running the check will give you a list of any warnings your theme has generated and what items are required for the theme to be accepted in the WordPress.org theme directory, as well as&nbsp;any recommended items that may be missing from your theme.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="developer" tabindex="-1">Developer <a href="#developer" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Developer</span></a></h3>
+<p>The <a href="https://wordpress.org/plugins/developer/">Developer</a> plugin is really just a tool to automatically download and install some of the plugins you’ll want when developing your theme. Some of the ones discussed in this handbook&nbsp;will already be installed and active. Others you can install as soon as you activate the plugin.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="debug-bar" tabindex="-1">Debug Bar <a href="#debug-bar" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Debug Bar</span></a></h3>
+<p><a href="https://wordpress.org/plugins/debug-bar/">Debug Bar</a> pushes all debug messages to a separate page where they are listed in an easy-to-read layout and organized&nbsp;by&nbsp;type of message. There are also a number of&nbsp;<a href="https://wordpress.org/plugins/search.php?q=debug+bar">other plugins</a>&nbsp;that add on to Debug Bar, extending its features or adding more&nbsp;information.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="log-deprecated-notices" tabindex="-1">Log Deprecated Notices <a href="#log-deprecated-notices" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Log Deprecated Notices</span></a></h3>
+<p><a href="https://wordpress.org/plugins/log-deprecated-notices/">Log Deprecated Notices</a> displays a list of the deprecated function notices in your theme and where the code can be found. This should be run, at minimum, after every&nbsp;major release of&nbsp;WordPress, so you can resolve and remove any deprecated code and functions from your theme.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="browser-testing" tabindex="-1">Browser testing <a href="#browser-testing" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Browser testing</span></a></h3>
+<p>When submitting your theme to WordPress.org, it’s expected that it works well in modern browsers and at any resolution. You should test your theme against a number of popular browsers before submitting, both mobile and desktop. Many browsers have built-in features making it easy to test, for example the <a href="https://developer.chrome.com/devtools">Chrome Developer Tools</a>, <a href="https://developer.mozilla.org/en-US/docs/Tools">Firefox Developer Tools</a>, and the <a href="http://dev.modern.ie">Internet Explorer / Microsoft Edge tools</a>.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="validation" tabindex="-1">Validation <a href="#validation" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Validation</span></a></h3>
+<p>Likewise, your theme should use valid HTML5 and CSS&nbsp;code. There are a variety of tools that will test your site for valid code, include <a href="http://html5.validator.nu/">this HTML5 validator</a> and <a href="http://jigsaw.w3.org/css-validator/">this CSS validator</a>.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+      
+    <nav class="handbook-navigation" role="navigation">
+      <h1 class="screen-reader-text">Handbook navigation</h1>
+      <div class="nav-links">
+
+      <a href="https://developer.wordpress.org/themes/release/required-theme-files/" rel="previous"><span class="meta-nav">←</span> Required Theme Files</a><a href="https://developer.wordpress.org/themes/release/theme-review-guidelines/" rel="next">Theme Review Guidelines <span class="meta-nav">→</span></a>
+      </div>
+      <!-- .nav-links -->
+    </nav><!-- .navigation -->
+  
+    
+    </main>
+<main id="main" class="site-main post-11429 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+    
+      
+<h1>Theme Review Guidelines</h1>
+
+
+<p>The <a title="https://make.wordpress.org/themes" href="https://make.wordpress.org/themes">WordPress Theme Review Team</a> provides and maintains the theme review guidelines as part of their task as WordPress Contributors and Developers for the <a href="https://wordpress.org/themes/">WordPress Theme Directory</a>. Some of these guidelines are required before themes are included in the theme directory. Other guidelines are recommendations for best practices in developing your theme and making it available to as many people as possible. This handbook uses both recommendations and requirements from the theme review guidelines to ensure the theme you develop is accessible to everyone.</p>
+<p>The requirements for being included in the WordPress.org theme directory can be found <a href="https://make.wordpress.org/themes/handbook/review/required/">here</a>.</p>
+<h2>Get Involved</h2>
+<p>The WordPress Theme Review Team is <a href="https://make.wordpress.org/themes/handbook/get-involved/become-a-reviewer/">open to anyone</a>&nbsp;and is a great way to get a better understanding of how themes are developed.&nbsp;To become a member of the WordPress Theme Review Team, read through the <a href="https://make.wordpress.org/themes/">WordPress Theme Review Team’s site</a>.</p>
+<p>&nbsp;</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+      
+    <nav class="handbook-navigation" role="navigation">
+      <h1 class="screen-reader-text">Handbook navigation</h1>
+      <div class="nav-links">
+
+      <a href="https://developer.wordpress.org/themes/release/testing/" rel="previous"><span class="meta-nav">←</span> Testing</a><a href="https://developer.wordpress.org/themes/release/writing-documentation/" rel="next">Writing Documentation <span class="meta-nav">→</span></a>
+      </div>
+      <!-- .nav-links -->
+    </nav><!-- .navigation -->
+  
+    
+    </main>
+<main id="main" class="site-main post-11431 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+    
+      
+<h1>Writing Documentation</h1>
+
+
+<p>Documentation is important for themes as it provides a way for users to understand what a theme does and does not support. Likewise, documenting the code of your theme will make it easier for other theme developers to customize your theme, likely with a <a href="https://developer.wordpress.org/themes/advanced-topics/child-themes/">child theme</a>.</p>
+<p>Here’s a list of <strong>requirements</strong> and <strong>recommendations&nbsp;</strong>for your theme’s documentation.</p>
+<ul>
+<li>Themes are <strong>required</strong> to provide end-user documentation of any design limitations or extraordinary installation/setup instructions.</li>
+<li>Themes are <strong>recommended</strong> to include a <a href="https://wordpress.org/plugins/about/readme.txt">readme.txt file</a>, using plugin directory’s readme.txt markdown format. This recommendation will soon become <em>required</em>.</li>
+</ul>
+<p>&nbsp;</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+      
+    <nav class="handbook-navigation" role="navigation">
+      <h1 class="screen-reader-text">Handbook navigation</h1>
+      <div class="nav-links">
+
+      <a href="https://developer.wordpress.org/themes/release/theme-review-guidelines/" rel="previous"><span class="meta-nav">←</span> Theme Review Guidelines</a><a href="https://developer.wordpress.org/themes/release/submitting-your-theme-to-wordpress-org/" rel="next">Submitting Your Theme to WordPress.org <span class="meta-nav">→</span></a>
+      </div>
+      <!-- .nav-links -->
+    </nav><!-- .navigation -->
+  
+    
+    </main>
+<main id="main" class="site-main post-11433 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+    
+      
+<h1>Submitting Your Theme to WordPress.org</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#need-help">Need Help?</a></li>
+<li><a href="#guidelines">Guidelines</a></li>
+<li><a href="#testing-with-sample-data">Testing With Sample Data</a></li>
+<li><a href="#uploading-your-theme">Uploading Your Theme</a></li></ul>
+</div>
+<p>Before themes are added to the WordPress Theme Directory, they are closely reviewed by the <a href="https://make.wordpress.org/themes/">Theme Review team</a> to make sure they adhere to basic <a href="https://make.wordpress.org/themes/handbook/review/required/">guidelines</a>. This review&nbsp;ensures that WordPress users across the globe can download themes that are high quality and secure.</p>
+<h2 class="toc-heading" id="need-help" tabindex="-1">Need Help? <a href="#need-help" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Need Help?</span></a></h2>
+<p>If you have theme development questions, please post them in the <a href="https://wordpress.org/support/forum/wp-advanced/">Developing with WordPress</a> forum. Volunteers from around the world are ready to assist you with the development of your theme.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="guidelines" tabindex="-1">Guidelines <a href="#guidelines" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Guidelines</span></a></h2>
+<p>Make sure you review the <a href="https://make.wordpress.org/themes/handbook/review/required/">Theme Review Guidelines</a> before uploading a theme. If you have questions about these guidelines, you can ask them in the <a href="https://wordpress.slack.com/messages/themereview/">#themereview</a> channel in <a href="https://chat.wordpress.org/">Slack</a>. Anyone with a WordPress.org account can access the Making WordPress Slack.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="testing-with-sample-data" tabindex="-1">Testing With Sample Data <a href="#testing-with-sample-data" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Testing With Sample Data</span></a></h2>
+<p>The <a href="https://make.wordpress.org/themes/">WordPress Theme Review Team</a> will be reviewing your theme using the sample data from the <a href="https://developer.wordpress.org/themes/release/testing/">Theme Unit Test</a>. Before uploading your theme for review, please test it with this sample export data.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="uploading-your-theme" tabindex="-1">Uploading Your Theme <a href="#uploading-your-theme" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Uploading Your Theme</span></a></h2>
+<p>When you are ready to submit your theme for review, please upload your theme ZIP at&nbsp;<a href="https://wordpress.org/themes/getting-started/">Themes &gt; Upload</a>.&nbsp;Future updates are to be uploaded via the same page.</p>
+<p>More information about the theme review process is available on the <a href="https://make.wordpress.org/themes/handbook/review/">Theme Review Team’s website</a>.</p>
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+</main>

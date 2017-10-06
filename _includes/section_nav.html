@@ -1,0 +1,22 @@
+{% assign docs = site.docs | sort: 'order' %}
+
+{% for doc in docs %}
+  {% if doc.url == page.url %}
+    <nav class="handbook-navigation">
+      <h1 class="screen-reader-text">Handbook navigation</h1>
+      <div class="nav-links">
+      {% unless forloop.first %}
+      {% assign previous = forloop.index0 | minus: 1 %}
+        <a href="{{ docs[previous].url }}" rel="previous"><span class="meta-nav">←</span>{{ docs[previous].title }}</a>
+      {% endunless %}
+
+      {% unless forloop.last %}
+      {% assign next = forloop.index0 | plus: 1 %}
+        <a href="{{ docs[next].url }}" rel="next">{{ docs[next].title }} <span class="meta-nav">→</span></a>
+      {% endunless %}
+      </div>
+      <!-- .nav-links -->
+    </nav><!-- .navigation -->
+    {% break %}
+  {% endif %}
+{% endfor %}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="{{ page.lang | default: site.lang | default: "en-US" }}">
+{% include head.html %}
+
+<body class="theme-handbook-template-default single single-theme-handbook admin-bar no-customize-support single-handbook">
+
+<div id="page" class="theme-handbook-template-default single single-theme-handbook admin-bar no-customize-support hfeed site devhub-wrap single-handbook">
+	<a href="#main" class="screen-reader-text">Skip to content</a>
+
+	<header id="masthead" class="site-header">
+		<div class="inner-wrap">
+			<div class="site-branding">
+				<h1 class="site-title">
+				<a href="https://developer.wordpress.org/themes/" rel="home">Theme Handbook</a>
+				</h1>
+			</div>
+		</div><!-- .inner-wrap -->
+	</header><!-- #masthead -->
+	<div id="content" class="site-content">
+		
+		<div id="content-area">
+			{% include section_nav.html %}
+			<div class="bottom-of-entry">&nbsp;</div>
+			
+			{{ content }}
+			{% include sidebar.html %}
+		</div><!-- #primary -->
+	</div><!-- #content -->
+</div><!-- #page -->
+
+{% include footer.html %}
+</body>
+</html>

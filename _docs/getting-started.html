@@ -1,0 +1,239 @@
+---
+title: Getting Started
+permalink: /getting-started/
+order: 1
+---
+<section class="site-main theme-handbook type-theme-handbook status-publish hentry type-handbook">
+  <h1>Getting Started</h1>
+
+  <p>Ready to start developing WordPress themes? You&#8217;re in the right place.</p>
+  <p>In this opening chapter, we&#8217;ll take a look at <a href="https://developer.wordpress.org/theme/getting-started/what-is-a-theme/">what WordPress themes are</a> and how they work. Then, we&#8217;ll discuss <a href="https://developer.wordpress.org/theme/getting-started/wordpress-licensing-the-gpl/">the GPL</a>, the software license used for WordPress and all of the themes in the WordPress theme directory.</p>
+  <p>Next, we&#8217;ll look at some of the tools you&#8217;ll need in your WordPress theme development toolkit and teach you how to <a href="https://developer.wordpress.org/theme/getting-started/setting-up-a-development-environment/">setup a local development environment</a>.</p>
+  <p>We&#8217;ll finish up this chapter by looking at a few solid <a href="https://developer.wordpress.org/themes/getting-started/theme-development-examples/">WordPress theme examples</a>.</p>
+
+  <div class="bottom-of-entry">&nbsp;</div>
+</section>
+
+<section class="site-main post-5796 theme-handbook type-theme-handbook status-publish hentry type-handbook">
+			
+<h1>Who Should Read This Handbook?</h1>
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#your-skill-level">Your skill level</a></li>
+<li><a href="#what-this-handbook-will-cover">What this handbook will cover</a></li></ul>
+</div>
+<p>The Theme Developer Handbook is a self-contained resource to help you learn the basics of WordPress theme development. You should read this handbook to accomplish a number of things:</p>
+<ul>
+<li>develop a child theme meant to work with a parent theme;</li>
+<li>create a new theme based on an existing one;</li>
+<li>understand the inner workings of themes in general; and</li>
+<li>develop a theme based on nothing but your imagination.</li>
+</ul>
+<h2 class="toc-heading" id="your-skill-level" tabindex="-1">Your skill level <a href="#your-skill-level" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Your skill level</span></a></h2>
+<p>To get the most out of this handbook, you should have&nbsp;an understanding and some experience with web technologies, such as HTML, CSS, and PHP. You should also be comfortable with setting up and configuring websites using WordPress.</p>
+<div class="callout callout-info"><p><span class="screen-reader-text">Note:</span> An understanding of how MySQL databases work, as well as server technologies in general, is helpful but not a requirement for developing WordPress themes. Likewise, while JavaScript knowledge can be useful, it is not required. </p>
+</div>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="what-this-handbook-will-cover" tabindex="-1">What this handbook will cover <a href="#what-this-handbook-will-cover" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">What this handbook will cover</span></a></h2>
+<p>This handbook provides the <strong>basic information required to develop WordPress themes</strong>, including in-depth coverage of essential template tags and functions.</p>
+<p>WordPress is a vast subject. Covering every possible tag, function, and scenario is beyond the scope of this handbook.&nbsp;If you need help with specific functions, you can find that information in the <a href="https://developer.wordpress.org/reference">code reference</a>.</p>
+<p>The&nbsp;purpose of this handbook is to give you a solid foundation for WordPress theme development, to provide&nbsp;step-by-step instruction in building&nbsp;basic themes,&nbsp;and to provide tips and resources useful in furthering your skills.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+		
+</section>
+
+<section class="site-main post-5803 theme-handbook type-theme-handbook status-publish hentry type-handbook">
+
+<h1>WordPress Licensing &amp; the GPL</h1>
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#gpl-basic-freedoms">GPL basic freedoms</a></li>
+<li><a href="#what-is%c2%a0free-in-the-context-of-software">What is&nbsp;“free” in the context of software?</a></li>
+<li><a href="#keeping-it-free-for-all">Keeping it free for all</a></li>
+<li><a href="#do-i-need-to-license-my-themes-under-the-gpl">Do I need to license my themes under the GPL?</a></li>
+<li><a href="#further-reading">Further Reading</a></li></ul>
+</div>
+<p>To develop WordPress themes for the public—either <a href="https://wordpress.org/themes/" rel="noreferrer">free</a> or <a href="https://wordpress.org/themes/commercial/" rel="noreferrer">paid</a>— you need to&nbsp;get acquainted with the <a href="https://wordpress.org/about/gpl/" rel="noreferrer">GNU General Public License</a>&nbsp;(GPL) that WordPress uses.</p>
+<h2 class="toc-heading" id="gpl-basic-freedoms" tabindex="-1">GPL basic freedoms <a href="#gpl-basic-freedoms" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">GPL basic freedoms</span></a></h2>
+<p>The spirit of openness and sharing has thrived within the WordPress community because of fundamental principles that form the core of its license. One way to think of the GPL is&nbsp;as a <em>“Bill of Rights”</em> for software. The GPL&nbsp;establishes the following four freedoms:</p>
+<ol>
+<li>Freedom to <em>run the program</em>&nbsp;for any purpose.</li>
+<li>Freedom to <em>study how the program works</em>&nbsp;and to change it, so it performs computing as you wish.</li>
+<li>Freedom to <em>redistribute copies,</em> so you can help your neighbor.</li>
+<li>Freedom to<em> distribute copies of your modified versions</em>, giving the community a chance to benefit from your changes.</li>
+</ol>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="what-is%c2%a0free-in-the-context-of-software" tabindex="-1">What is&nbsp;“free” in the context of software? <a href="#what-is%c2%a0free-in-the-context-of-software" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">What is&nbsp;“free” in the context of software?</span></a></h2>
+<p>The ‘free’ in free software, refers to freedom and not price. The Free Software Foundation likes to say “free as in speech, not as in beer.” Free software is software that users can use to do as they wish. It need&nbsp;not be free from cost, although the ones hosted on the <a href="https://wordpress.org/themes/">WordPress.org theme directory</a> are.</p>
+<p>Free software can come with a price tag. In other words, you can create a GPL theme and sell it for $50, and it would still be free software. Why? Because the user is free to run, modify, and distribute the software or any modifications of that software.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="keeping-it-free-for-all" tabindex="-1">Keeping it free for all <a href="#keeping-it-free-for-all" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Keeping it free for all</span></a></h2>
+<p>The freedoms of the&nbsp;GPL don’t only&nbsp;apply to the original piece of software; works derived from GPL-licensed software must also adopt the same license, without restrictions or additional terms.</p>
+<p>In this sense, the GPL provides the ultimate protection of freedom by making sure that anything that is derived from free software cannot be “locked down”after the fact; it must remain forever free to future experimentation and exploration.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="do-i-need-to-license-my-themes-under-the-gpl" tabindex="-1">Do I need to license my themes under the GPL? <a href="#do-i-need-to-license-my-themes-under-the-gpl" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Do I need to license my themes under the GPL?</span></a></h2>
+<p>If you have no plans to distribute your theme then you do not need to adopt the GPL license for your work. The GPL only applies to <em>distributed</em> software. If you are not distributing your software – for example, a theme used only by yourself or on your local machine – you do not need to adopt the GPL.</p>
+<p>If you wish to submit your creation to the free theme repository on WordPress.org, it must be 100% GPL compliant, including CSS and image files.&nbsp;Because the freedoms spelled out in the GPL are at the heart of WordPress, we encourage developers to distribute their themes with a 100% GPL-compatible license.</p>
+<div class="callout callout-info"><p><span class="screen-reader-text">Note:</span> Freedom is an important part of developing WordPress themes. <strong>If you plan to distribute your theme, it is a good idea to license it fully under the GPL</strong>, so others can enjoy the same freedoms that you did when creating it.</p>
+</div>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="further-reading" tabindex="-1">Further Reading <a href="#further-reading" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Further Reading</span></a></h2>
+<p>To deepen your understanding of WordPress and the GPL:</p>
+<ul>
+<li><a href="https://wordpress.org/news/2009/07/themes-are-gpl-too/" rel="noreferrer">WordPress.org: Themes are GPL, too</a></li>
+<li><a href="http://ma.tt/2009/10/matt-qa-wordpress-gpl/" rel="noreferrer">Matt: Q&amp;A: WordPress &amp; GPL</a></li>
+<li><a href="http://ma.tt/2014/01/four-freedoms/" rel="noreferrer">Matt: The Four Freedoms</a></li>
+<li><a href="http://www.gnu.org/licenses/gpl-2.0.html" rel="noreferrer">GNU General Public License, version 2</a></li>
+<li><a href="http://www.gnu.org/licenses/gpl.html" rel="noreferrer">GNU General Public License, version 3</a></li>
+</ul>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+		
+</section>
+
+<section class="site-main post-5806 theme-handbook type-theme-handbook status-publish hentry type-handbook">
+			
+<h1>Setting up a Development Environment</h1>
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#why-set-up-a-development-environment">Why set up a development environment?</a></li>
+<li><a href="#your%c2%a0wordpress-local-development-environment">Your&nbsp;WordPress local development environment</a></li>
+<li><a href="#supporting-older-versions-of-wordpress">Supporting older versions of WordPress</a></li>
+<li><a href="#wp_debug">WP_DEBUG</a></li>
+<li><a href="#other-wordpress-development-tools">Other WordPress Development Tools</a>
+<ul>
+<li><a href="#test-data"><strong>Test Data</strong></a></li>
+<li><a href="#plugins"><strong>Plugins</strong></a>
+</li></ul></li>
+<li><a href="#wordpress-theme-review-guidelines">WordPress Theme Review Guidelines</a></li>
+<li><a href="#further-resources">Further Resources</a></li></ul>
+</div>
+<h2 class="toc-heading" id="why-set-up-a-development-environment" tabindex="-1">Why set up a development environment? <a href="#why-set-up-a-development-environment" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Why set up a development environment?</span></a></h2>
+<p>When developing themes, it is best to do it in an environment identical to the production server which will eventually host your WordPress installation. &nbsp;Your development environment can either be local or remote. &nbsp;Configuring a local environment to work on your WordPress theme is beneficial for several reasons:</p>
+<ul>
+<li>You can build your theme locally without relying on a remote server. This speeds up your development process and allows you to&nbsp;see changes instantly in your browser.</li>
+<li>You do not need an Internet connection to build your theme.</li>
+<li>You can test your theme from a variety of perspectives. This is important, especially if you plan on releasing your theme to a larger audience and&nbsp;want to ensure maximum compatibility.</li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="your%c2%a0wordpress-local-development-environment" tabindex="-1">Your&nbsp;WordPress local development environment <a href="#your%c2%a0wordpress-local-development-environment" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Your&nbsp;WordPress local development environment</span></a></h2>
+<p>For developing WordPress themes, you need to set up a development environment suited to WordPress.&nbsp; To get started, you will need a local server stack and a text editor.&nbsp; There are a number of options, including:</p>
+<p><strong>Local Server Stack</strong></p>
+<ul>
+<li>A local server stack, such as LAMP (<strong>L</strong>inux <strong>A</strong>pache <strong>M</strong>ySQL/<strong>M</strong>ariaDB <strong>P</strong>HP) or WAMP (<strong>W</strong>indows <strong>A</strong>pache <strong>M</strong>ySQL/<strong>M</strong>ariaDB <strong>P</strong>HP) is a server (much like the server that runs on your web server), which you will configure on your local machine. You can install pre-bundled programs that contain all of these, like <a href="http://www.mamp.info/">MAMP</a> (for Mac), or <a href="http://www.apachefriends.org/index.html">XAMPP</a> (Mac or Windows) to quickly setup your environment.</li>
+</ul>
+<p><strong>Virtualized Environment</strong></p>
+<ul>
+<li>A virtualized such created with Vagrant and VirtualBox allows you to create easily reproducible development environments. <a href="https://github.com/Varying-Vagrant-Vagrants/VVV">Varying Vagrant Vagrants (VVV)</a> is a popular Vagrant option which creates a WordPress development environment.</li>
+</ul>
+<p><strong>Text Editor</strong></p>
+<p>In addition to a local server environment, you also need a text editor to write your code. Your choice of text editor is personal, but remember that a good text editor can speed up your development process. Your text editor can be everything from a basic tool for writing code to a fully integrated development environment (IDE) with tools for debugging and testing. It’s worth doing research, and some even include support for WordPress development. Popular choices are Atom, Sublime Text, and PhpStorm.</p>
+<p>You can find a <a href="https://developer.wordpress.org/themes/getting-started/setting-up-a-development-environment/#further-resources">list of tutorials for setting up development environments at the bottom of the page.</a></p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="supporting-older-versions-of-wordpress" tabindex="-1">Supporting older versions of WordPress <a href="#supporting-older-versions-of-wordpress" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Supporting older versions of WordPress</span></a></h2>
+<p>It’s standard practice for WordPress themes to support <em>at least two versions back</em> to ensure a minimum of backward compatibility. For example, if the current version of WordPress is at 4.6, then you should also make sure that your theme works well in versions 4.5 and 4.4 as well.</p>
+<p>You can refer to the <a href="https://wordpress.org/about/roadmap/" rel="noreferrer">WordPress Roadmap</a> page to access older versions of WordPress. Then you can download and install older WordPress versions, creating multiple development sites, each running different WordPress versions for testing.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="wp_debug" tabindex="-1">WP_DEBUG <a href="#wp_debug" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">WP_DEBUG</span></a></h2>
+<p>Configuring debugging is an essential part of WordPress theme development. WordPress provides a number of constants to support your debugging efforts. These includes:</p>
+<p><strong>WP_DEBUG</strong></p>
+<p>The <a title="WP_DEBUG" href="https://codex.wordpress.org/WP_DEBUG">WP_DEBUG</a>&nbsp;PHP constant is used to trigger the built-in “debug” mode on your WordPress installation. This allows&nbsp;you to view errors in your theme. To enable it:</p>
+<p>1. Open&nbsp;your WordPress installation’s <em>wp-config.php</em> file</p>
+<p>2. Change: </p>
+<pre class="brush: php; title: ; notranslate" title="">define( 'WP_DEBUG', false );</pre>
+<p> to </p>
+<pre class="brush: php; title: ; notranslate" title=""> define( 'WP_DEBUG', true );</pre>
+<blockquote><div class="callout callout-info"><p><span class="screen-reader-text">Note:</span> While normally set to ‘false’ in the <em>wp-config.php</em> file, development copies of WordPress—alpha and beta versions of the upcoming release—WP_DEBUG is already set to ‘true’ by default.</p>
+</div></blockquote>
+<p><strong>WP_DEBUG_DISPLAY and WP_DEBUG_LOG</strong></p>
+<p><a href="https://codex.wordpress.org/Debugging_in_WordPress#WP_DEBUG_LOG">WP_DEBUG_LOG</a>&nbsp;and&nbsp;<a href="https://codex.wordpress.org/Debugging_in_WordPress#WP_DEBUG_DISPLAY">WP_DEBUG_DISPLAY</a> are additional PHP constants which extend WP_DEBUG.</p>
+<p>WP_DEBUG_LOG is used in conjunction with WP_DEBUG to log all error messages to a debug.log within your WordPress /wp-content/ directory. To enable this functionality set WP_DEBUG_LOG to true within your wp-config.php file.</p>
+<pre class="brush: php; title: ; notranslate" title="">
+define( 'WP_DEBUG_LOG', true );
+
+</pre>
+<p>WP_DEBUG_DISPLAY is used to control whether debug messages display within the HTML of your theme pages. To display error messages on the screen as they occur, configure this setting to ‘true’ within your <em>wp-config.php</em> file.</p>
+<pre class="brush: php; title: ; notranslate" title="">
+define( 'WP_DEBUG_DISPLAY', true );
+
+</pre>
+<p>With the WP_DEBUG and WP_DEBUG_DISPLAY enabled, error messages will display at the top of your site pages.</p>
+<p><a href="https://developer.wordpress.org/files/2014/07/admin-sample-debug.png"><img class="alignnone size-full wp-image-22754" src="https://developer.wordpress.org/files/2014/07/admin-sample-debug.png" alt="admin-sample-debug" width="895" height="340" srcset="https://developer.wordpress.org/files/2014/07/admin-sample-debug.png 895w, https://developer.wordpress.org/files/2014/07/admin-sample-debug-300x114.png 300w, https://developer.wordpress.org/files/2014/07/admin-sample-debug-768x292.png 768w" sizes="(max-width: 895px) 100vw, 895px"></a></p>
+<div class="callout callout-info"><p><span class="screen-reader-text">Note:</span> Errors will display in the frontend and admin areas of your site.These debug tools&nbsp;are meant for local testing and staging installs, not for live sites.</p>
+</div>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="other-wordpress-development-tools" tabindex="-1">Other WordPress Development Tools <a href="#other-wordpress-development-tools" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Other WordPress Development Tools</span></a></h2>
+<p>In addition to WP_DEBUG, the following plugins and unit test data sets are an important part of your <a href="http://nacin.com/2010/04/23/5-ways-to-debug-wordpress/" rel="noreferrer">development toolset</a>&nbsp;and help you develop&nbsp;better&nbsp;WordPress themes.</p>
+<h4 class="toc-heading" id="test-data" tabindex="-1"><strong>Test Data</strong> <a href="#test-data" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text"><strong>Test Data</strong></span></a></h4>
+<p><strong>WordPress.org Theme Unit Test Data</strong></p>
+<p><a href="https://codex.wordpress.org/Theme_Unit_Test" rel="noreferrer">WordPress.org Theme Unit Test Data</a>&nbsp;is an XML file containing dummy test data that you can upload to test how themes perform with different types and layouts of content.</p>
+<p><strong>WordPress.com Theme Unit Test Data</strong></p>
+<p><a href="http://themetest.wordpress.com/" rel="noreferrer">WordPress.com Theme Unit Test Data</a>&nbsp;is dummy test data that you can upload to a WordPress installation to test your theme, including WordPress.com-specific features.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h4 class="toc-heading" id="plugins" tabindex="-1"><strong>Plugins</strong> <a href="#plugins" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text"><strong>Plugins</strong></span></a></h4>
+<p><strong>Debug Bar</strong> <strong>(WordPress plugin)</strong></p>
+<p><a href="https://wordpress.org/plugins/debug-bar/">Debug Bar</a> adds an admin bar to your WordPress admin providing a central location for debugging.</p>
+<p><strong>Query Monitor</strong> <strong>(WordPress plugin)</strong></p>
+<p><a href="https://wordpress.org/plugins/query-monitor/">Query Monitor</a> allows debugging of database queries, API request and AJAX called used to generate theme pages and theme functionality.</p>
+<p><strong>Log Deprecated Notices</strong> <strong>(WordPress plugin)</strong></p>
+<p><a href="https://wordpress.org/plugins/log-deprecated-notices/">Log Deprecated Notices</a> logs incorrect function usage and the use of deprecated files and functions in your WordPress theme.</p>
+<p><strong>Monster Widgets</strong> <strong>(WordPress plugin)</strong></p>
+<p><a href="https://wordpress.org/plugins/monster-widget/">Monster Widget</a> consolidates the core WordPress widgets into a single widget allowing you to test widgets styling and functionality in your theme.</p>
+<p><strong>Developer (WordPress plugin)</strong></p>
+<p><a href="https://wordpress.org/plugins/developer/" rel="noreferrer">Developer</a>&nbsp;helps optimize your development environment by allowing easy installation of tools and plugins that help in troubleshooting and ensuring code quality.</p>
+<p><strong>Theme-Check (WordPress plugin)</strong></p>
+<p><a title="Theme-Check: A simple and easy way to test your theme for all the latest WordPress standards and practices." href="https://wordpress.org/plugins/theme-check/">Theme-Check</a>&nbsp;<span style="color: #444444">tests your theme for compliance with&nbsp;the latest WordPress standards and practices.</span></p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="wordpress-theme-review-guidelines" tabindex="-1">WordPress Theme Review Guidelines <a href="#wordpress-theme-review-guidelines" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">WordPress Theme Review Guidelines</span></a></h2>
+<p>In addition to the above development tools, it’s a good idea to stay up to date on the WordPress.org Theme Review Team’s&nbsp;<a href="https://make.wordpress.org/themes/guidelines/">Guidelines</a>&nbsp;for theme submission and guidance on meeting <a href="https://make.wordpress.org/core/handbook/best-practices/coding-standards/">WordPress Coding Standards</a>. &nbsp;These guidelines are the “gold standard” for quality theme development and&nbsp;are useful, even if you don’t plan on releasing a theme on&nbsp;WordPress.org.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="further-resources" tabindex="-1">Further Resources <a href="#further-resources" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Further Resources</span></a></h2>
+<ul>
+<li><a title="Setting up your Development Environment for WordPress.com VIP" href="http://www.smashingmagazine.com/2011/09/28/developing-wordpress-locally-with-mamp/">Developing WordPress Locally With MAMP</a>&nbsp;(Mac, MAMP)</li>
+<li><a title="How to Setup a WordPress Development Environment for Windows" href="http://code.tutsplus.com/articles/how-to-setup-a-wordpress-development-environment-for-windows--wp-23365">How to Setup a WordPress Development Environment for Windows</a>&nbsp;(Windows, XAMPP)</li>
+<li><a title=" WordPress Theme Review VVV: A Quick Vagrant Setup for Testing Themes" href="http://wptavern.com/wordpress-theme-review-vvv-a-quick-vagrant-setup-for-testing-and-reviewing-themes">WordPress Theme Review VVV: A Quick Vagrant Setup for Testing Themes</a>&nbsp;(Cross-platform, Vagrant)</li>
+<li><a title="Setting up your Development Environment for WordPress.com VIP" href="http://vip.wordpress.com/documentation/development-environment/">Setting up your Development Environment</a> (WordPress.com VIP)</li>
+<li><a title="A fantastically exhaustive set of test data to measure the integrity of your plugins and themes." href="http://wptest.io/">wptest.io</a> – an exhaustive set of WordPress test data derived from&nbsp;<a title="Theme Unit Test" href="https://codex.wordpress.org/Theme_Unit_Test" target="_blank" rel="noopener">WordPress’ Theme Unit Test</a></li>
+</ul>
+
+<div class="bottom-of-entry">&nbsp;</div>
+		
+</section>
+
+<section class="site-main post-5809 theme-handbook type-theme-handbook status-publish hentry type-handbook">
+			
+<h1>Theme Development Examples</h1>
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#default-twenty-themes">Default “Twenty” themes</a></li>
+<li><a href="#the-underscores-theme">The Underscores theme</a></li>
+<li><a href="#other-sources">Other Sources</a></li></ul>
+</div>
+<p>One of the best ways to understand theme coding standards is to find examples of other themes that have been written with these standards in mind.</p>
+<h2 class="toc-heading" id="default-twenty-themes" tabindex="-1">Default “Twenty” themes <a href="#default-twenty-themes" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Default “Twenty” themes</span></a></h2>
+<p>Packaged in every version of WordPress since version 3.0 (and named after the year they were released in), the default themes are some of the best to study how themes are built. This&nbsp;is because they are designed with broad use in mind and fully adhere to&nbsp;WordPress coding standards. You can&nbsp;download and study their theme files, and keep them around&nbsp;as examples to&nbsp;reference while learning how to develop your own themes:</p>
+<ul>
+<li><a href="https://core.trac.wordpress.org/browser/trunk/src/wp-content/themes/twentyseventeen">Twenty Seventeen</a></li>
+<li><a href="https://core.trac.wordpress.org/browser/trunk/src/wp-content/themes/twentysixteen">Twenty Sixteen</a>&nbsp;<a href="https://core.trac.wordpress.org/ticket/36497">(only packaged in WordPress 4.8)</a></li>
+<li><a href="https://core.trac.wordpress.org/browser/trunk/src/wp-content/themes/twentyfifteen">Twenty Fifteen</a></li>
+<li><a href="https://core.trac.wordpress.org/browser/trunk/src/wp-content/themes/twentyfourteen" rel="noreferrer">Twenty Fourteen</a></li>
+<li><a href="https://core.trac.wordpress.org/browser/trunk/src/wp-content/themes/twentythirteen" rel="noreferrer">Twenty Thirteen</a></li>
+<li><a href="https://core.trac.wordpress.org/browser/trunk/src/wp-content/themes/twentytwelve" rel="noreferrer">Twenty Twelve</a></li>
+<li><a href="https://core.trac.wordpress.org/browser/trunk/src/wp-content/themes/twentyeleven" rel="noreferrer">Twenty Eleven</a></li>
+<li><a href="https://core.trac.wordpress.org/browser/trunk/src/wp-content/themes/twentyten" rel="noreferrer">Twenty Ten</a></li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="the-underscores-theme" tabindex="-1">The Underscores theme <a href="#the-underscores-theme" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">The Underscores theme</span></a></h2>
+<p>Unlike the default “Twenties” themes, the <strong>_s</strong> (or Underscores) theme is aimed at developers rather than end-users. It is intended to be a <em>starter theme</em>&nbsp;which you can use as a base to speed your development. It has a number of features:</p>
+<ul>
+<li>Well-commented HTML5 templates, including error templates.</li>
+<li>A sample custom header&nbsp;implementation in <code>inc/custom-header.php</code>.</li>
+<li>Custom template tags in <code>inc/template-tags</code> to&nbsp;keep&nbsp;templates organized&nbsp;and prevent code duplication.</li>
+<li>A number of scripts to improve keyboard navigation—found in <code>js/keyboard-image-navigation.js</code>—as well as&nbsp;small screen navigation in <code>js/navigation.js</code>.</li>
+<li>Five sample&nbsp;CSS layouts in&nbsp;<code>/layouts</code>&nbsp;as well as starter CSS on which to build your design.</li>
+<li>GPL-licensed code.</li>
+</ul>
+<p>The features above make Underscores a great theme for a developer wanting to create their own theme. And even if you remove the extras, the base that’s left is a still an excellent&nbsp;example of a well-coded theme, developed with standards and best-practices in mind.</p>
+<p>A more detailed overview is available on <a href="http://underscores.me/">Underscores’ website</a>.</p>
+<p><a href="https://github.com/Automattic/_s/">Code for Underscores may be found at github</a>.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="other-sources" tabindex="-1">Other Sources <a href="#other-sources" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Other Sources</span></a></h2>
+<p>Additionally, all themes published in the <a href="https://wordpress.org/themes/">theme directory</a> are reviewed for standards prior to being published. <a href="https://make.wordpress.org/themes/">Reviewing themes</a> in the directory is a great way to better understand how theme development works and is a good way to get&nbsp;inspiration for your own theme.</p>
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+<nav class="handbook-navigation">
+  <h1 class="screen-reader-text">Handbook navigation</h1>
+  <div class="nav-links">
+
+  <a href="/basics/" rel="next">Theme Basics <span class="meta-nav">→</span></a>
+  </div>
+  <!-- .nav-links -->
+</nav><!-- .navigation -->
+
+</section>

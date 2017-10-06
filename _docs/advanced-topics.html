@@ -1,0 +1,572 @@
+---
+title: Advanced Theme Topics
+permalink: /advanced-topics/
+order: 7
+---
+
+<main id="main" class="site-main post-5821 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+<h1>Advanced Theme Topics</h1>
+
+<p>In this section, we’ll look at some advanced theme topics.</p>
+<p>We’ll start with the use of&nbsp;<a title="Child Themes" href="https://developer.wordpress.org/themes/advanced-topics/child-themes/">Child Themes</a>&nbsp;for modifying aspects of the theme.</p>
+<p>We’ll also look at <a title="UI Best Practices" href="https://developer.wordpress.org/themes/advanced-topics/ui-best-practices/">User Interface (UI) Best Practices</a> and <a title="JavaScript Best Practices" href="https://developer.wordpress.org/themes/advanced-topics/javascript-best-practices/">JavaScript Best Practices</a>. This is followed by performing checks of the theme using <a title="Theme Unit Tests" href="https://developer.wordpress.org/themes/advanced-topics/theme-testing/">Theme Unit Tests</a> and <a title="Validating Your Theme" href="https://developer.wordpress.org/themes/advanced-topics/validating-your-theme/">validating the theme’s markup</a>.</p>
+<p>Finally, we’ll look at ensuring&nbsp;your theme works well with <a title="Plugin API Hooks" href="https://developer.wordpress.org/themes/advanced-topics/plugin-api-hooks/">Plugin API Hooks</a>.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/theme-security/common-vulnerabilities/" rel="previous"><span class="meta-nav">←</span> Common Vulnerabilities</a><a href="https://developer.wordpress.org/themes/advanced-topics/child-themes/" rel="next">Child Themes <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main id="main" class="site-main post-11387 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>Child Themes</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#what-is-a-parent-theme">What is a Parent Theme?</a></li>
+<li><a href="#what-is-a-child-theme">What is a Child Theme?</a></li>
+<li><a href="#how-to-create-a-child-theme">How to Create a Child Theme</a>
+<ul>
+<li><a href="#1-create-a-child-theme-folder">1. Create a child theme folder</a></li>
+<li><a href="#2-create-a-stylesheet-style-css">2. Create a stylesheet: style.css</a></li>
+<li><a href="#3-enqueue-stylesheet">3. Enqueue stylesheet</a></li>
+<li><a href="#activate-child-theme">Activate child theme</a>
+</li></ul></li>
+<li><a href="#adding-template-files">Adding Template Files</a></li>
+<li><a href="#using-functions-php">Using functions.php</a></li>
+<li><a href="#referencing-or-including-other-files">Referencing or Including Other Files</a></li>
+<li><a href="#enqueueing-styles-and-scripts">Enqueueing Styles and Scripts</a></li>
+<li><a href="#special-considerations">Special Considerations</a>
+<ul>
+<li><a href="#post-formats">Post Formats</a></li>
+<li><a href="#rtl-support">RTL Support</a></li>
+<li><a href="#internationalization">Internationalization</a>
+<ul>
+<li><a href="#example-textdomain">Example: textdomain</a></li>
+<li><a href="#example-gettext-functions">Example: gettext functions</a></li></ul>
+</li></ul></li></ul></div>
+<p>A child theme allows you to change small aspects of your site’s appearance yet still preserve your theme’s look and functionality. To understand how child themes work it is first important to understand the relationship between parent and child themes.</p>
+<h2 class="toc-heading" id="what-is-a-parent-theme" tabindex="-1">What is a Parent Theme? <a href="#what-is-a-parent-theme" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">What is a Parent Theme?</span></a></h2>
+<p>A parent theme is a complete theme which includes all of the <a href="https://developer.wordpress.org/themes/getting-started/what-is-a-theme/#required-files">required WordPress template files</a> and assets for the theme to work. All themes – excluding child themes – are considered parent themes.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="what-is-a-child-theme" tabindex="-1">What is a Child Theme? <a href="#what-is-a-child-theme" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">What is a Child Theme?</span></a></h2>
+<p>As indicated in the overview, a child theme inherits the look and feel of the parent theme and all of its functions, but can be used to make modifications to any part of the theme. In this way, customizations are kept  separate from the parent theme’s files. Using a child theme lets you upgrade the parent theme without affecting the customizations you’ve made to your site.</p>
+<p>Child themes:</p>
+<ul>
+<li>make your modifications portable and replicable;</li>
+<li>keep customization separate from parent theme functions;</li>
+<li>allow parent themes to be updated without destroying your modifications;</li>
+<li>allow you to take advantage of the effort and testing put into parent theme;</li>
+<li>save on development time since you are not recreating the wheel; and</li>
+<li>are a <em>great way</em> to start learning about theme development.</li>
+</ul>
+<div class="callout callout-info"><p><span class="screen-reader-text">Note:</span>  If you are making extensive customizations – beyond styles and a few theme files – creating a parent theme might be a better option than a child theme. Creating a parent theme allows you to avoid issues with deprecated code in the future. This needs to be decided on a case-by-case basis.</p>
+</div>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="how-to-create-a-child-theme" tabindex="-1">How to Create a Child Theme <a href="#how-to-create-a-child-theme" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">How to Create a Child Theme</span></a></h2>
+<h3 class="toc-heading" id="1-create-a-child-theme-folder" tabindex="-1">1. Create a child theme folder <a href="#1-create-a-child-theme-folder" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">1. Create a child theme folder</span></a></h3>
+<p>First, create a new folder in your themes directory, located at <code>wp-content/themes</code>.</p>
+<p>The directory needs a name. It’s best practice to give a child theme the same name as the parent, but with <code>-child</code> appended to the end. For example, if you were making a child theme of <code>twentyfifteen</code>, then the directory would be named <code>twentyfifteen-child</code>.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="2-create-a-stylesheet-style-css" tabindex="-1">2. Create a stylesheet: style.css <a href="#2-create-a-stylesheet-style-css" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">2. Create a stylesheet: style.css</span></a></h3>
+<p>Next, you’ll need to create a stylesheet file named <code>style.css</code>, which will contain all of the CSS rules and declarations that control the look of your theme. Your stylesheet must contain the below required header comment at the very top of the file. This tells WordPress basic info about the theme, including the fact that it is a child theme with a particular parent.</p>
+<pre class="brush: css; title: ; notranslate" title="">/*
+ Theme Name:   Twenty Fifteen Child
+ Theme URI:    http://example.com/twenty-fifteen-child/
+ Description:  Twenty Fifteen Child Theme
+ Author:       John Doe
+ Author URI:   http://example.com
+ Template:     twentyfifteen
+ Version:      1.0.0
+ License:      GNU General Public License v2 or later
+ License URI:  http://www.gnu.org/licenses/gpl-2.0.html
+ Tags:         light, dark, two-columns, right-sidebar, responsive-layout, accessibility-ready
+ Text Domain:  twenty-fifteen-child
+*/</pre>
+<p>The following information is required:</p>
+<ul>
+<li><strong>Theme Name –</strong> needs to be unique to your theme</li>
+<li><strong>Template – </strong> the name of the parent theme directory. The parent theme in our example is the Twenty Fifteen theme, so the Template will be <code>twentyfifteen</code>. You may be working with a different theme, so adjust accordingly.</li>
+</ul>
+<p>Add remaining information as applicable. The only required child theme file is style.css, but functions.php is necessary to enqueue styles correctly (below).</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="3-enqueue-stylesheet" tabindex="-1">3. Enqueue stylesheet <a href="#3-enqueue-stylesheet" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">3. Enqueue stylesheet</span></a></h3>
+<p>The final step is to enqueue the parent and child theme stylesheets.<br>
+</p><div class="callout callout-info"><p><span class="screen-reader-text">Note:</span> In the past, the common method was to import the parent theme stylesheet using <code>@import</code>; this is no longer the recommended practice, as it increases the amount of time it takes style sheets to load. Plus it is possible for the parent stylesheet to get included twice.</p>
+</div><br>
+The recommended way of enqueuing the parent theme stylesheet currently is to add a wp_enqueue_scripts action and use <a href="https://developer.wordpress.org/reference/functions/wp_enqueue_style/">wp_enqueue_style()</a> in your child theme’s <code>functions.php</code>.<br>
+You will therefore need to create a <code>functions.php</code> in your child theme directory. The first line of your child theme’s <code>functions.php</code> will be an opening PHP tag (&lt;?php), after which you can enqueue your parent and child theme stylesheets. The following example function will only work if your Parent Theme uses only one main <code>style.css</code> to hold all of the css. If your child theme has more than one <code>.css</code> file (eg. <code>ie.css</code>, <code>style.css</code>, <code>main.css</code>) then you will have to make sure to maintain all of the Parent Theme dependencies.<p></p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php
+add_action( 'wp_enqueue_scripts', 'my_theme_enqueue_styles' );
+function my_theme_enqueue_styles() {
+    wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
+
+}
+?&gt;
+</pre>
+<p>If your child theme style.css contains actual CSS code (as it normally does), you will need to enqueue it as well. Setting ‘parent-style’ as a dependency will ensure that the child theme stylesheet loads after it. Including the child theme version number ensures that you can bust cache also for the child theme. The complete (recommended) example becomes: </p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php
+add_action( 'wp_enqueue_scripts', 'my_theme_enqueue_styles' );
+function my_theme_enqueue_styles() {
+
+    $parent_style = 'parent-style'; // This is 'twentyfifteen-style' for the Twenty Fifteen theme.
+
+    wp_enqueue_style( $parent_style, get_template_directory_uri() . '/style.css' );
+    wp_enqueue_style( 'child-style',
+        get_stylesheet_directory_uri() . '/style.css',
+        array( $parent_style ),
+        wp_get_theme()-&gt;get('Version')
+    );
+}
+?&gt;
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p>where parent-style is the same <code>$handle</code> used in the parent theme when it registers it’s stylesheet.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="activate-child-theme" tabindex="-1">Activate child theme <a href="#activate-child-theme" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Activate child theme</span></a></h3>
+<p>Your child theme is now ready for activation. Log in to your site’s Administration Screen, and go to <strong>Administration Screen &gt; Appearance &gt; Themes</strong>. You should see your child theme listed and ready for activation. (If your WordPress installation is multi-site enabled, then you may need to switch to your network Administration Screen to enable the theme (within the Network Admin Themes Screen tab). You can then switch back to your site-specific WordPress Administration Screen to activate your child theme.)</p>
+<div class="callout callout-info"><p><span class="screen-reader-text">Note:</span> You may need to re-save your menu from <strong>Appearance &gt; Menus</strong> and theme options (including background and header images) after activating the child theme. </p>
+</div>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="adding-template-files" tabindex="-1">Adding Template Files <a href="#adding-template-files" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Adding Template Files</span></a></h2>
+<p>Other than the <code>functions.php</code> file (as noted above), <strong>any file you add to your child theme will overwrite the same file in the parent theme</strong>.</p>
+<p>In most cases, it’s best to create a copy of the template files you want to change from the parent theme, then make your modifications to the copied files, leaving the parent files unchanged. For example, if you wanted to change the code of the parent theme’s <code>header.php</code> file, you would copy the file to your child theme folder and customize it there.</p>
+<p></p><div class="callout callout-tip"><p><span class="screen-reader-text">Tip:</span>  There are several plugins which allow you to detect what specific template is being used on the page at which you are looking.</p>
+<ul>
+<li><a href="https://wordpress.org/plugins/what-the-file/">What The File</a></li>
+<li><a href="https://wordpress.org/plugins/what-template-file-am-i-viewing/">What Template File Am I Viewing?</a></li>
+<li><a href="https://wordpress.org/plugins/debug-bar/">Debug Bar</a><br>
+</li></ul></div>
+
+<p>You can also include files in the child theme that are not included in the parent theme. For instance, you might want to create a more specific template than is found in your parent theme, such as a template for a specific page or category archive (e.g. page-3.php would load for a Page with the ID of 3).</p>
+<p>See the <a title="Template Heirarchy Page" href="https://developer.wordpress.org/themes/basics/template-hierarchy/" target="_blank">Template Hierarchy</a> page for more information about how WordPress determines which template to use.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="using-functions-php" tabindex="-1">Using functions.php <a href="#using-functions-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Using functions.php</span></a></h2>
+<p>Unlike <code>style.css</code>, the <code>functions.php</code> of a child theme does not override its counterpart from the parent. Instead, it is <strong>loaded in addition to the parent’s functions.php</strong>. (Specifically, it is loaded right before the parent’s file.)</p>
+<p>In that way, the <code>functions.php</code> of a child theme provides a smart, trouble-free method of modifying the functionality of a parent theme. Say that you want to add a PHP function to your theme. The fastest way would be to open its <code>functions.php</code> file and put the function there. But that’s not smart: The next time your theme is updated, your function will disappear. But there is an alternative way which is the smart way: you can create a child theme, add a <code>functions.php</code> file in it, and add your function to that file. The function will do the exact same job from there too, with the advantage that it will not be affected by future updates of the parent theme. Do not copy the full content of functions.php of the parent theme into functions.php in the child theme.</p>
+<p>The structure of <code>functions.php</code> is simple: An opening PHP tag at the top, and below it, your bits of PHP. In it you can put as many or as few functions as you wish. The example below shows an elementary <code>functions.php</code> file that does one simple thing: Adds a favicon link to the head element of HTML pages. </p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php // Opening PHP tag - nothing should be before this, not even whitespace
+
+// Custom Function to Include
+function my_favicon_link() {
+    echo '&lt;link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" /&gt;' . "\n";
+}
+add_action( 'wp_head', 'my_favicon_link' );
+</pre>
+<div class="callout callout-tip"><p><span class="screen-reader-text">Tip:</span> The fact that a child theme’s functions.php is loaded first means that you can make the user functions of your theme pluggable —that is, replaceable by a child theme— by declaring them conditionally.</p>
+<pre>if ( ! function_exists( 'theme_special_nav' ) ) {
+    function theme_special_nav() {
+        //  Do something.
+    }
+}</pre>
+<p>In that way, a child theme can replace a PHP function of the parent by simply declaring it beforehand. </p>
+</div>
+<p>For more information about what to include in your child theme’s <code>functions.php</code> file, read through the <a href="https://developer.wordpress.org/themes/basics/theme-functions/">Theme Functions</a> page.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="referencing-or-including-other-files" tabindex="-1">Referencing or Including Other Files <a href="#referencing-or-including-other-files" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Referencing or Including Other Files</span></a></h2>
+<p>When you need to include files that reside within your child theme’s directory structure, you will need to use <a href="https://developer.wordpress.org/reference/functions/get_stylesheet_directory/">get_stylesheet_directory()</a>. Since the <code>style.css</code> is in the root of your child theme’s subdirectory, <a href="https://developer.wordpress.org/reference/functions/get_stylesheet_directory/">get_stylesheet_directory()</a> points to your child theme’s directory (not the parent theme’s directory). To reference the parent theme directory, you would use <a href="https://developer.wordpress.org/reference/functions/get_template_directory/">get_template_directory()</a> instead.</p>
+<p>Below is an example illustrating how to use <a href="https://developer.wordpress.org/reference/functions/get_stylesheet_directory/">get_stylesheet_directory()</a> when referencing a file stored within the child theme directory:</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php require_once( get_stylesheet_directory(). '/my_included_file.php' ); ?&gt;</pre>
+<p>Meanwhile, this example uses <code><a href="https://developer.wordpress.org/reference/functions/get_stylesheet_directory_uri/">get_stylesheet_directory_uri()</a></code> to display  an image that is stored within the <code>/images</code> folder in the child theme directory.</p>
+<pre class="brush: xml; title: ; notranslate" title="">&lt;img src="&lt;?php echo get_stylesheet_directory_uri(); ?&gt;/images/my_picture.png" alt="" /&gt;</pre>
+<p>Unlike <code>get_stylesheet_directory()</code>, which returns a file path, <code>get_stylesheet_directory_uri()</code> returns a URL, which is useful for front-end assets.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="enqueueing-styles-and-scripts" tabindex="-1">Enqueueing Styles and Scripts <a href="#enqueueing-styles-and-scripts" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Enqueueing Styles and Scripts</span></a></h2>
+<p>Scripts and styles should each be enqueued with their own function, and then those should be wrapped in an action. For more information, read the page on <a href="https://developer.wordpress.org/themes/basics/including-css-javascript/">Including CSS and JavaScript</a>.</p>
+<p>WordPress won’t automatically load the stylesheet for your child theme on the front-end. Below is an example of using the <code><a href="https://developer.wordpress.org/reference/functions/wp_enqueue_scripts/">wp_enqueue_scripts()</a></code> action hook to call a function that enqueues the child theme’s stylesheet.</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php
+add_action( 'wp_enqueue_scripts', 'my_plugin_add_stylesheet' );
+function my_plugin_add_stylesheet() {
+    wp_enqueue_style( 'my-style', get_stylesheet_directory_uri() . '/style.css', false, '1.0', 'all' );
+}
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="special-considerations" tabindex="-1">Special Considerations <a href="#special-considerations" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Special Considerations</span></a></h2>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="post-formats" tabindex="-1">Post Formats <a href="#post-formats" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Post Formats</span></a></h3>
+<p>A child theme inherits <a href="https://developer.wordpress.org/themes/functionality/post-formats/">post formats</a> as defined by the parent theme. But when creating child themes, be aware that using <code><a href="https://developer.wordpress.org/reference/functions/add_theme_support/">add_theme_support('post-formats')</a></code> will <strong>override</strong> the formats as defined by the parent theme, not add to it.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="rtl-support" tabindex="-1">RTL Support <a href="#rtl-support" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">RTL Support</span></a></h3>
+<p>To support RTL languages, add a <code>rtl.css</code> file to your child theme, containing:</p>
+<pre class="brush: css; title: ; notranslate" title="">/*
+Theme Name: Twenty Fifteen Child
+Template: twentyfifteen
+*/
+</pre>
+<p>Even if the parent theme does not have an <code>rtl.css</code> file, it’s recommended to add the <code>rtl.css</code> file to your child theme. WordPress will auto-load the <code>rtl.css</code> file only if <code><a href="https://developer.wordpress.org/reference/functions/is_rtl/">is_rtl()</a></code> is true.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="internationalization" tabindex="-1">Internationalization <a href="#internationalization" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Internationalization</span></a></h3>
+<p>Child themes can be prepared for translation into other languages by using the WordPress <a href="https://developer.wordpress.org/themes/functionality/internationalization/">Internationalization API</a>. There are special considerations regarding internationalization of child themes.</p>
+<p>To internationalize a child theme follow these steps:<br>
+1. Add a languages directory.</p>
+<ul>
+<li>For example: <code>twentyfifteen-child/languages/</code></li>
+</ul>
+<p>2. Add language files.</p>
+<ul>
+<li>Your filenames have to be <code>he_IL.po</code> &amp; <code>he_IL.mo</code> (depending on your language), unlike plugin files which are <code>domain-he_IL.xx</code>.</li>
+</ul>
+<p>3. Load a textdomain</p>
+<ul>
+<li>Use <a href="https://developer.wordpress.org/reference/functions/load_child_theme_textdomain/">load_child_theme_textdomain()</a> in <code>functions.php</code> during the after_setup_theme action.</li>
+<li>The text domain defined in <a href="https://developer.wordpress.org/reference/functions/load_child_theme_textdomain/">load_child_theme_textdomain()</a> should be used to translate all strings in the child theme.</li>
+</ul>
+<p>4. Use GetText functions to add i18n support for your strings.</p>
+<h4 class="toc-heading" id="example-textdomain" tabindex="-1">Example: textdomain <a href="#example-textdomain" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Example: textdomain</span></a></h4>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php
+/**
+  * Set up My Child Theme's textdomain.
+  *
+  * Declare textdomain for this child theme.
+  * Translations can be added to the /languages/ directory.
+  */
+function twentyfifteenchild_theme_setup() {
+    load_child_theme_textdomain( 'twentyfifteenchild', get_stylesheet_directory() . '/languages' );
+}
+add_action( 'after_setup_theme', 'twentyfifteenchild_theme_setup' );
+?&gt;
+</pre>
+<p>At this point, strings in the child theme are ready for translation. To ensure they are properly internationalized for translation, each string needs to have the <code>twentyfifteenchild</code> textdomain.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h4 class="toc-heading" id="example-gettext-functions" tabindex="-1">Example: gettext functions <a href="#example-gettext-functions" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Example: gettext functions</span></a></h4>
+<p>Here is an example of echoing the phrase “Code is Poetry”:</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;?php
+esc_html_e( 'Code is Poetry', 'twentyfifteenchild' );
+?&gt;
+</pre>
+<p>The text domain defined in <code><a href="https://developer.wordpress.org/reference/functions/load_child_theme_textdomain/">load_child_theme_textdomain()</a></code> should be used to translate all strings in the child theme. In the event that a template file from the parent them has been included, the textdomain should be changed from the one defined in the parent theme to the one defined by the child theme.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/advanced-topics/" rel="previous"><span class="meta-nav">←</span> Advanced Theme Topics</a><a href="https://developer.wordpress.org/themes/advanced-topics/ui-best-practices/" rel="next">UI Best Practices <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main id="main" class="site-main post-11399 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>UI Best Practices</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#logo-homepage-link">Logo Homepage Link</a></li>
+<li><a href="#descriptive-anchor-text">Descriptive Anchor Text</a></li>
+<li><a href="#style%c2%a0links-with-underlines">Style&nbsp;Links with Underlines</a></li>
+<li><a href="#different-link-colors">Different Link Colors</a></li>
+<li><a href="#color-contrast">Color Contrast</a></li>
+<li><a href="#sufficient-font-size">Sufficient Font Size</a></li>
+<li><a href="#associate-labels-with-inputs">Associate Labels with Inputs</a></li>
+<li><a href="#placeholder-text-in-forms">Placeholder Text in Forms</a></li>
+<li><a href="#descriptive-buttons">Descriptive Buttons</a></li></ul>
+</div>
+<h2 class="toc-heading" id="logo-homepage-link" tabindex="-1">Logo Homepage Link <a href="#logo-homepage-link" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Logo Homepage Link</span></a></h2>
+<p>The logo at the top each&nbsp;page should send the user to the homepage of your site. Assuming your logo is in your theme directory, this is how to&nbsp;display it in the&nbsp;<code>header.php</code>&nbsp;template file.</p>
+<pre class="brush: php; title: ; notranslate" title="">&lt;a href="&lt;?php echo home_url(); ?&gt;"&gt;&lt;img src="&lt;?php echo get_stylesheet_directory_uri(); ?&gt;/logo.png" alt="Website Logo" /&gt;&lt;/a&gt;</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="descriptive-anchor-text" tabindex="-1">Descriptive Anchor Text <a href="#descriptive-anchor-text" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Descriptive Anchor Text</span></a></h2>
+<p>The anchor text is&nbsp;the visible text&nbsp;for a&nbsp;hyperlink. Good link text should give the reader an&nbsp;idea of the action that will take place&nbsp;when&nbsp;clicking it.</p>
+<p>A bad example:</p>
+<pre>The best way to learn WordPress is to start using it. To Download WordPress, <a href="https://wordpress.org/download/">click here</a>.
+</pre>
+<p>A better example:</p>
+<pre><a href="https://wordpress.org/download/">Download WordPress</a> and start using it. That's the best way to learn.
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="style%c2%a0links-with-underlines" tabindex="-1">Style&nbsp;Links with Underlines <a href="#style%c2%a0links-with-underlines" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Style&nbsp;Links with Underlines</span></a></h2>
+<p>By default, browsers underline links to let the user know what is clickable. Some designers use CSS to turn off underlines for hyperlinks. This causes&nbsp;usability and accessibility problems, as it makes it more difficult to identify&nbsp;hyperlinks from the surrounding text.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="different-link-colors" tabindex="-1">Different Link Colors <a href="#different-link-colors" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Different Link Colors</span></a></h2>
+<p>Color is another&nbsp;visual cue&nbsp;that text is clickable. Styling&nbsp;hyperlinks with&nbsp;a different color than the surrounding text makes&nbsp;them&nbsp;easier to distinguish.</p>
+<p>Hyperlinks are one of the few HTML features that&nbsp;have state. The two most important states are <em>visited</em> and <em>unvisited</em>.</p>
+<p>Having different colors for these two states helps users&nbsp;identify the pages they’ve visited before. A good trick for taking the guess&nbsp;work out of visited links is to color them 10%-20% darker than the unvisited links.</p>
+<p>There are 3 other states that links can have:</p>
+<ul>
+<li>hover, when a mouse is over an element</li>
+<li>focus, similar to hover but for keyboard users</li>
+<li>active, when a user is clicking on a link</li>
+</ul>
+<p>Since&nbsp;hover and focus have similar meanings, it is useful to give them the same&nbsp;styles.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="color-contrast" tabindex="-1">Color Contrast <a href="#color-contrast" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Color Contrast</span></a></h2>
+<p>Color contrast refers to the <strong>difference between two colors</strong>. Contrast is low between navy blue and black. Contrast is high between white and black. Jonathan Snook provides a <a href="http://www.snook.ca/technical/colour_contrast/colour.html">color contrast calculator</a> to help you determine the contrast in your website design. The WCAG 2.0 requires a ratio of&nbsp;4.5:1 on normal text to be <a href="http://www.w3.org/WAI/WCAG20/quickref/#qr-visual-audio-contrast-contrast">AA compliant</a>.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="sufficient-font-size" tabindex="-1">Sufficient Font Size <a href="#sufficient-font-size" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Sufficient Font Size</span></a></h2>
+<p>Make your text easy to read. By making your text large enough, you increase the usability of your site and make the content easier to understand. 14px is the smallest&nbsp;text&nbsp;should be.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="associate-labels-with-inputs" tabindex="-1">Associate Labels with Inputs <a href="#associate-labels-with-inputs" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Associate Labels with Inputs</span></a></h2>
+<p>Labels inform the user what an input field is for.&nbsp;You&nbsp;can connect the label to the input&nbsp;by using the <code>for</code> attribute in the label.&nbsp;This&nbsp;will allow the&nbsp;user to&nbsp;click the label and&nbsp;focus on the input field.</p>
+<pre class="brush: xml; title: ; notranslate" title="">&lt;label for="username"&gt;Username&lt;/label&gt;
+&lt;input type="text" id="username" name="login" /&gt;
+</pre>
+<p>Labels work for radio buttons as well. Since it works using the&nbsp;<strong>id</strong> field <em>and not the name</em>, each input for the&nbsp;group gets its own label.</p>
+<pre class="brush: xml; title: ; notranslate" title="">&lt;input type="radio" id="user_group_blogger" name="user_group" value="blogger" /&gt;
+&lt;label for="user_group_blogger"&gt;Blogger&lt;/label&gt;
+
+&lt;input type="radio"  id="user_group_designer" name="user_group" value="designer" /&gt;
+&lt;label for="user_group_designer"&gt;Designer&lt;/label&gt;
+
+&lt;input type="radio"  id="user_group_developer" name="user_group" value="developer" /&gt;
+&lt;label for="user_group_developer"&gt;Developer&lt;/label&gt;
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="placeholder-text-in-forms" tabindex="-1">Placeholder Text in Forms <a href="#placeholder-text-in-forms" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Placeholder Text in Forms</span></a></h2>
+<p>Placeholder text shows the user an example of what to type. When a user puts their cursor in the field, the placeholder text will disappear, while the label remains.</p>
+<pre class="brush: xml; title: ; notranslate" title="">&lt;label for="name"&gt;Name&lt;/label&gt;
+&lt;input type="text" id="name" name="name" placeholder="John Smith" /&gt;
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="descriptive-buttons" tabindex="-1">Descriptive Buttons <a href="#descriptive-buttons" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Descriptive Buttons</span></a></h2>
+<p>The web is filled the buttons that have unclear meanings. Remember that last&nbsp;time you used ‘OK’ or ‘submit’ on your login form? Of course you do :) Choosing&nbsp;better words to display on your buttons can make your website easier to use.&nbsp;Try the pattern <em>[verb] [noun]</em> — Create user, Delete File, Update&nbsp;Password, Send Message. Each describes what will happen when the user&nbsp;clicks the button.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/advanced-topics/child-themes/" rel="previous"><span class="meta-nav">←</span> Child Themes</a><a href="https://developer.wordpress.org/themes/advanced-topics/javascript-best-practices/" rel="next">JavaScript Best Practices <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main id="main" class="site-main post-11401 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>JavaScript Best Practices</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#use-included-libraries">Use Included Libraries</a></li>
+<li><a href="#standard-javascript">Standard JavaScript</a></li>
+<li><a href="#jquery">jQuery</a>
+<ul>
+<li><a href="#including-jquery-in-your-theme">Including jQuery in your theme</a>
+<ul>
+<li><a href="#using">Using $</a>
+</li></ul></li>
+<li><a href="#selectors">Selectors</a></li>
+<li><a href="#event-handling">Event Handling</a></li></ul>
+</li></ul></div>
+<p>Many themes use JavaScript to provide interactivity, animation or other enhancements. These best practices will help ensure your code works efficiently and does not cause conflicts with your content or plugins.</p>
+<h2 class="toc-heading" id="use-included-libraries" tabindex="-1">Use Included Libraries <a href="#use-included-libraries" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Use Included Libraries</span></a></h2>
+<p>There are many useful JavaScript libraries you may want to include when building your theme. Did you know that WordPress comes bundled with dozens of popular libraries? Check out this <a title="Default Scripts Included with WordPress" href="https://developer.wordpress.org/themes/basics/including-css-javascript/#default-scripts-included-and-registered-by-wordpress">list of default scripts included with WordPress</a>.</p>
+<p>A common mistake made by beginning theme and plugin developers is to bundle their theme or plugin with their own version of the library. This may conflict with other plugins that enqueue the version bundled with WordPress. As a best practice, make your theme compatible with the version of your favorite library included with WordPress.</p>
+<div class="callout callout-warning"><p><span class="screen-reader-text">Warning:</span> Do not try to use your own version of a JavaScript library that is already <a title="Default Scripts Included with WordPress" href="https://developer.wordpress.org/themes/basics/including-css-javascript/#default-scripts-included-and-registered-by-wordpress">bundled</a> with WordPress. Doing so may break core functionality and conflict with plugins.</p>
+</div>
+<p>If you feel you MUST replace the WordPress version with one of your own… well… the answer is still: don’t do it.&nbsp; The versions of JavaScript libraries used by WordPress may include custom tweaks that WordPress needs to operate.&nbsp; Any time you override these libraries, you risk breaking your WordPress instance. Moreover, plugins created by other authors should be written to be compatible with WordPress’s version of these libraries as well. Adding your own version may (and often does!) conflict with plugins.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="standard-javascript" tabindex="-1">Standard JavaScript <a href="#standard-javascript" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Standard JavaScript</span></a></h2>
+<p>Javascript is growing in popularity for web developers, and it’s being used to accomplish for a variety of tasks. Here are some best practices to use when writing your JavaScript</p>
+<ul>
+<li>Avoid Global Variables</li>
+<li>Keep your JavaScript unobtrusive</li>
+<li>Use closures and the <a href="https://carldanley.com/js-module-pattern/">module pattern</a></li>
+<li>Stick to a coding style. Use The <a href="https://make.wordpress.org/core/handbook/coding-standards/javascript/">WordPress Javascript Coding Standard</a>.</li>
+<li>Validate and Lint Your Code – <a href="http://JSLint.com">JSLint.com</a></li>
+<li>Ensure your site still works without JavaScript first – then add JavaScript to provide additional capabilities. This is a form of&nbsp;<a href="http://en.wikipedia.org/wiki/Progressive_enhancement">Progressive Enhancement</a>.</li>
+<li>Lazy load assets that aren’t immediately required.</li>
+<li>Don’t use jQuery <em>if you don’t need to</em>&nbsp;—&nbsp;There’s a great site that shows you how to do some common tasks with plain old JavaScript – <a href="http://http://youmightnotneedjquery.com">you might not need jQuery</a></li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="jquery" tabindex="-1">jQuery <a href="#jquery" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">jQuery</span></a></h2>
+<h3 class="toc-heading" id="including-jquery-in-your-theme" tabindex="-1">Including jQuery in your theme <a href="#including-jquery-in-your-theme" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Including jQuery in your theme</span></a></h3>
+<p><a href="http://www.jquery.com">jQuery</a> is a popular JavaScript library to make working with JavaScript easier and more reliable across browsers. If you use jQuery, be sure to <a title="Including CSS and JavaScript" href="https://make.wordpress.org/docs/theme-developer-handbook/theme-basics/including-css-and-javascript/#javascript">follow the handbook guidelines on including JavaScript</a>. Giving your theme’s enqueued .js files a dependency array of <code>array( 'jquery' )</code> ensures that the jQuery script has been downloaded and loaded before your theme’s code.</p>
+<h4 class="toc-heading" id="using" tabindex="-1">Using $ <a href="#using" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Using $</span></a></h4>
+<p>Because the copy of jQuery included in WordPress loads in (link needed) <code>noConflict()</code> mode, use this wrapper code in your theme’s .js files to map “$” to “jQuery”:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">( function( $ ) {
+    // Your code goes here
+} )( jQuery );
+</pre>
+<p>This wrapper (called an Immediately Invoked Function Expression, or IIFE) lets you pass in a variable—jQuery—on the bottom line, and give it the name “$” internally. Within this wrapper you may use <code>$</code> to select elements as normal.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="selectors" tabindex="-1">Selectors <a href="#selectors" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Selectors</span></a></h3>
+<p>Every time you select an element with jQuery, it performs a query through your document’s markup. These queries are very fast, but they do take time—you can make your site respond faster by re-using your jQuery objects instead of using a new query. So instead of repeating selectors:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">// Anti-pattern
+$('.post img').addClass('theme-image');
+$('.post img').on('click', function() { /* ... */ });
+</pre>
+<p>it is recommended to <strong>cache your selectors</strong> so you can re-use the returned element without having to repeat the lookup process:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">var $postImage = $('.post img');
+// All image tags within posts can now be accessed through $postImage
+$postImage.addClass('theme-image');
+$postImage.on('click', function() { /* ... */ });
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="event-handling" tabindex="-1">Event Handling <a href="#event-handling" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Event Handling</span></a></h3>
+<p>When you use jQuery methods like <code>.bind</code> or <code>.click</code>, jQuery creates a new browser event object to handle processing the requested event. Each new event created takes a small amount of memory, but the amount of memory required goes up the more events you bind. If you have a page with a hundred anchor tags and wanted to fire a `logClick` event handler whenever a user clicked a link, it is very easy to write code like this:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">// Anti-pattern
+$('a').click( logClick );
+</pre>
+<p>This works, but under the hood you have asked jQuery to create a new event handler for every link on your page.</p>
+<p><strong>Event delegation</strong> is a way to accomplish the same effect with less overhead. Because events in jQuery “bubble”—that is, a click event will fire on a link, then on the link’s surrounding <code>&lt;p&gt;</code> tag, then on the <code>div</code> container, and so on up to the <code>document</code> object itself—we can put a single event handler higher up in the page structure, and still catch the click events for all of those links:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">// Bind one handler at the document level, which is triggered
+// whenever there is a "click" event originating from an "a" tag
+$(document).on('click', 'a', logClick);
+</pre>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/advanced-topics/ui-best-practices/" rel="previous"><span class="meta-nav">←</span> UI Best Practices</a><a href="https://developer.wordpress.org/themes/advanced-topics/theme-testing/" rel="next">Theme Testing <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main id="main" class="site-main post-11403 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>Theme Testing</h1>
+
+
+<p>The <a href="https://github.com/WPTRT/theme-unit-test/blob/master/themeunittestdata.wordpress.xml">Theme Unit Test data</a>&nbsp;is a WordPress import file will fill a WordPress site with enough stub data (posts, media, users) to test a theme.</p>
+<p>The <a href="https://codex.wordpress.org/Theme_Unit_Test">Theme Unit Tests</a> are manual tests to walk through to test theme functionality and how the theme responds to edge-cases of content and settings.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/advanced-topics/javascript-best-practices/" rel="previous"><span class="meta-nav">←</span> JavaScript Best Practices</a><a href="https://developer.wordpress.org/themes/advanced-topics/validating-your-theme/" rel="next">Validating Your Theme <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main id="main" class="site-main post-11407 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>Validating Your Theme</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h3>Topics</h3><ul class="items"><li><a href="#validation-techniques">Validation Techniques</a></li>
+<li><a href="#validation-checklist">Validation Checklist</a>
+<ul>
+<li><a href="#validate-html">Validate HTML</a></li>
+<li><a href="#validate-css">Validate CSS</a></li>
+<li><a href="#validate-feeds">Validate Feeds</a>
+</li></ul></li>
+<li><a href="#validation-resources-and-articles"><span class="mw-headline">Validation Resources and Articles</span></a></li>
+<li><a href="#related">Related</a></li></ul>
+</div>
+<p>Validating the markup of your theme is the process of ensuring that the web pages conform to web standards defined by various organizations. These standards ensure web pages are interpreted in the same way by different&nbsp;browsers,&nbsp;search engines, and other web clients.</p>
+<p>Conforming to standards and regulations is one of many ways you can make your theme universally understood. Make sure your code and styles validate across the board. That means they have to meet the standards set by the <a class="external text" title="http://w3c.org" href="http://w3c.org">W3C Organization</a> and pass a variety of validations for <a title="Glossary" href="/Glossary#CSS">CSS</a> and <a title="Glossary" href="/Glossary#XHTML">XHTML</a>.</p>
+<p>Not all validators check for the same things. Some only check CSS, others XHTML, and others for accessibility. If you are sincere in presenting standardized pages to the public, test them with several validators. The World Wide Web Consortium sets the standards and also hosts a variety of <a class="external text" title="http://www.w3.org/QA/Tools/" href="http://www.w3.org/QA/Tools/">web page validators</a>.</p>
+<h3 class="toc-heading" id="validation-techniques" tabindex="-1">Validation Techniques <a href="#validation-techniques" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Validation Techniques</span></a></h3>
+<p>Validating your WordPress site means more than just checking the front page for errors. A theme’s template files are loaded in a modular fashion.&nbsp;While you may fix all the errors associated with the <code>index.php</code> and <code>sidebar.php</code>&nbsp;on your front page, errors may still exist&nbsp;within other template files such as <code>single.php</code>, <code>page.php</code>, <code>archives.php</code>, or <code>category.php</code>. Validate pages that load each of your theme&nbsp;template files.</p>
+<p>The <a class="external text" title="https://wordpress.org/support/forum/11" href="https://wordpress.org/support/forum/11">Your WordPress</a> section in the <a class="external text" title="https://wordpress.org/support/" href="https://wordpress.org/support/">WordPress Forums</a> is dedicated to helping WordPress users in getting feedback about their sites. WordPress volunteers will do that for you for free. Be sure and read the <a title="WordPress Site Reviews" href="/WordPress_Site_Reviews">WordPress Site Reviews Guidelines</a>.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="validation-checklist" tabindex="-1">Validation Checklist <a href="#validation-checklist" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Validation Checklist</span></a></h3>
+<p>To help you validate your WordPress site, here is a quick checklist:</p>
+<ol>
+<li>Validate your HTML / CSS / Feeds (see below)</li>
+<li>Validate accessibility –&nbsp;<a href="http://achecker.ca/checker/index.php">WCAG Guidelines</a>, Section 508 Standards and&nbsp;WAI standards</li>
+<li>Check different browsers</li>
+<li>Re-validate HTML and CSS</li>
+</ol>
+<h4 class="toc-heading" id="validate-html" tabindex="-1">Validate HTML <a href="#validate-html" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Validate HTML</span></a></h4>
+<ul>
+<li><a class="external text" title="http://validator.w3.org/" href="http://validator.w3.org/">The W3C’s HTML Validation Service</a> (URL and upload)</li>
+<li><a class="external text" title="http://www.w3.org/QA/Tools/" href="http://www.w3.org/QA/Tools/">W3C’s Collection of Validators</a></li>
+<li><a class="external text" title="http://cgi.w3.org/cgi-bin/tidy" href="http://cgi.w3.org/cgi-bin/tidy">W3C Tidy Online</a></li>
+<li><a class="external text" title="http://www.silktide.com/" href="http://www.silktide.com/">Silk Tide Online Validator for Errors and Accessibility</a></li>
+<li><a class="external text" title="http://perso.wanadoo.fr/ablavier/TidyGUI/" href="http://perso.wanadoo.fr/ablavier/TidyGUI/">Windows GUI Interface for TIDY</a></li>
+<li><a class="external text" title="http://sitereportcard.com/" href="http://sitereportcard.com/">Site Report Card Validator</a></li>
+<li><a class="external text" title="http://valet.webthing.com/page/" href="http://valet.webthing.com/page/">Valet Webthing.com</a></li>
+<li><a class="external text" title="http://watson.addy.com/" href="http://watson.addy.com/">Watson Addy’s Validator</a></li>
+<li><a class="external text" title="http://www.alpineinternet.com/.docs/pg/drhtml.html" href="http://www.alpineinternet.com/.docs/pg/drhtml.html">Alpine Internet HTML Validator</a></li>
+<li><a class="external text" title="http://www.anybrowser.com/validateit.html" href="http://www.anybrowser.com/validateit.html">AnyBrowser’s HTML Validation</a></li>
+<li><a class="external text" title="http://www.cynthiasays.com/" href="http://www.cynthiasays.com/">Cynthia Says Validator</a></li>
+<li><a class="external text" title="http://www.doctor-html.com/RxHTML/" href="http://www.doctor-html.com/RxHTML/">Doctor-HTML Validator</a></li>
+<li><a class="external text" title="http://www.htmlvalidator.com/lite/onlineval.php" href="http://www.htmlvalidator.com/lite/onlineval.php">HTMLvalidator.com’s Validator</a></li>
+<li><a class="external text" title="http://www.softwareqatest.com/qatweb1.html" href="http://www.softwareqatest.com/qatweb1.html">Software QA and Testing Resource Center</a></li>
+<li><a class="external text" title="http://www.tafweb.com/tagcheck.html" href="http://www.tafweb.com/tagcheck.html">HTML Tag Checker</a></li>
+<li><a class="external text" title="http://www.w3.org/People/Raggett/tidy/" href="http://www.w3.org/People/Raggett/tidy/">W3.org Tidy Validator</a></li>
+<li><a class="external text" title="http://www.htmlhelp.com/tools/validator/upload.html" href="http://www.htmlhelp.com/tools/validator/upload.html">HTMLHelp’s File Upload HTML Validator</a>&nbsp;(upload)</li>
+<li><a class="external text" title="http://searchengineworld.com/validator/file-upload.htm" href="http://searchengineworld.com/validator/file-upload.htm">Searchengineworld’s HTML File Upload Validator</a>&nbsp;(upload)</li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h4 class="toc-heading" id="validate-css" tabindex="-1">Validate CSS <a href="#validate-css" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Validate CSS</span></a></h4>
+<ul>
+<li><a class="external text" title="http://jigsaw.w3.org/css-validator/" href="http://jigsaw.w3.org/css-validator/">W3.org’s CSS Validator</a> (URL, upload, and direct paste in)</li>
+<li><a class="external text" title="http://www.style-sheets.com/validator.asp" href="http://www.style-sheets.com/validator.asp">Style-Sheets.com Validator</a> (browser specific)</li>
+<li><a class="external text" title="http://jigsaw.w3.org/css-validator/validator-uri.html.en" href="http://jigsaw.w3.org/css-validator/validator-uri.html.en">W3C Style sheet validator</a></li>
+<li><a class="external text" title="http://www.htmlhelp.com/tools/csscheck/" href="http://www.htmlhelp.com/tools/csscheck/">WDG and HTMLhelp.com’s CSS Validator and Checker</a> (URL, upload, and direct paste)</li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h4 class="toc-heading" id="validate-feeds" tabindex="-1">Validate Feeds <a href="#validate-feeds" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Validate Feeds</span></a></h4>
+<ul>
+<li><a class="external text" title="http://feedvalidator.org/" href="http://feedvalidator.org/">Feedvalidator.org</a> – for Atom and RSS feeds.</li>
+<li><a class="external text" title="http://www.ldodds.com/rss_validator/1.0/validator.html" href="http://www.ldodds.com/rss_validator/1.0/validator.html">Experimental RSS 1.0 Validator</a></li>
+<li><a class="external text" title="http://librdf.org/rss/" href="http://librdf.org/rss/">Redlands RSS 1.0 Validator</a></li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="validation-resources-and-articles" tabindex="-1"><span class="mw-headline">Validation Resources and Articles</span> <a href="#validation-resources-and-articles" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text"><span class="mw-headline">Validation Resources and Articles</span></span></a></h3>
+<ul>
+<li><a title="Writing Code in Your Posts" href="/Writing_Code_in_Your_Posts">Writing Code in Your Posts</a></li>
+<li><a class="external text" title="http://home.columbus.rr.com/mfreeman/web_validation.htm" href="http://home.columbus.rr.com/mfreeman/web_validation.htm">Mark Freeman’s Many Links to Validation Resources</a></li>
+<li><a class="external text" title="http://www.squarefree.com/bookmarklets/validation.html" href="http://www.squarefree.com/bookmarklets/validation.html">Squarefree’s Bookmarketlets</a> (JavaScript for web page testing)</li>
+<li><a class="external text" title="http://www.walidator.com/" href="http://www.walidator.com/">Walidator.com</a></li>
+<li><a class="external text" title="http://webdesign.about.com/library/weekly/aa041000a.htm" href="http://webdesign.about.com/library/weekly/aa041000a.htm">Understanding How HTML Validators Work</a></li>
+<li><a class="external text" title="http://www.evolt.org/article/You_Call_em_That_em_Web_Site_Testing/25/2396/index.html" href="http://www.evolt.org/article/You_Call_em_That_em_Web_Site_Testing/25/2396/index.html">You Call That Web Site Testing?</a></li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="related" tabindex="-1">Related <a href="#related" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Related</span></a></h3>
+<ul>
+<li><a title="Accessibility" href="/Accessibility">Accessibility</a></li>
+</ul>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/advanced-topics/theme-testing/" rel="previous"><span class="meta-nav">←</span> Theme Testing</a><a href="https://developer.wordpress.org/themes/advanced-topics/plugin-api-hooks/" rel="next">Plugin API Hooks <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main id="main" class="site-main post-11409 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>Plugin API Hooks</h1>
+
+
+<p>A&nbsp;theme should work well with WordPress plugins. Plugins add functionality by using action and filters, which are collectively called hooks&nbsp;(see&nbsp;<a title="Plugin API" href="https://codex.wordpress.org/Plugin_API">Plugin API</a>&nbsp;for more information).</p>
+<p>Most hooks&nbsp;are executed internally by WordPress, so your theme does not need&nbsp;special tags for them to work. However,&nbsp;a few hooks&nbsp;need to be included in your theme templates. These hooks are fired by special Template Tags:</p>
+<dl>
+<dt><a title="Function Reference/wp head" href="https://developer.wordpress.org/reference/functions/wp_head/">wp_head()</a></dt>
+<dd>Goes at the end of&nbsp;the&nbsp;<tt>&lt;head&gt;</tt>&nbsp;element of a theme’s&nbsp;<i>header.php</i> template file.&nbsp;</dd>
+</dl>
+<dl>
+<dt><a title="Function Reference/wp footer" href="https://developer.wordpress.org/reference/functions/wp_footer/">wp_footer()</a></dt>
+<dd>Goes in&nbsp;<i>footer.php</i>, just before the closing&nbsp;<tt>&lt;/body&gt;</tt>&nbsp;tag.&nbsp;</dd>
+</dl>
+<dl>
+<dt><a title="Function Reference/wp meta" href="https://developer.wordpress.org/reference/functions/wp_meta/">wp_meta()</a></dt>
+<dd>Typically goes in the&nbsp;<tt>&lt;li&gt;Meta&lt;/li&gt;</tt>&nbsp;section of a Theme’s menu or sidebar.&nbsp;</dd>
+</dl>
+<dl>
+<dt><a title="Function Reference/comment form" href="https://developer.wordpress.org/reference/functions/comment_form/">comment_form()</a></dt>
+<dd>Goes in&nbsp;<i>comments.php</i>&nbsp;directly before the file’s closing tag (<tt>&lt;/div&gt;</tt>).&nbsp;</dd>
+</dl>
+<p>Take a look at&nbsp;a core theme’s templates for examples of how these hooks are used.</p>
+
+<div class="bottom-of-entry">&nbsp;</div>
+</main>

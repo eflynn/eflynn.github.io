@@ -1,0 +1,971 @@
+---
+title: Theme Options – The Customize API
+permalink: /customize-api/
+order: 5
+---
+
+<main id="main" class="site-main theme-handbook type-theme-handbook status-publish has-post-thumbnail hentry type-handbook" role="main">
+			
+<h1>Theme Options – The Customize API</h1>
+
+<p>The Customize API (Customizer) is a framework for live-previewing any change to WordPress. It provides a unified&nbsp;interface for users to customize various aspects of their theme and their site, from colors and layouts to widgets, menus, and more. Themes and plugins alike can add options to the Customizer. The Customizer is the canonical way to&nbsp;add&nbsp;options to your theme.</p>
+<div id="attachment_22437" style="width: 650px" class="wp-caption alignnone"><a href="https://developer.wordpress.org/files/2014/10/customize-4.6.png"><img class="wp-image-22437 size-large" src="https://developer.wordpress.org/files/2014/10/customize-4.6-1024x576.png" alt="The customizer as it appears in WordPress 4.6 with the Twenty Fifteen theme." width="640" height="360" srcset="https://developer.wordpress.org/files/2014/10/customize-4.6-1024x576.png 1024w, https://developer.wordpress.org/files/2014/10/customize-4.6-300x169.png 300w, https://developer.wordpress.org/files/2014/10/customize-4.6-768x432.png 768w, https://developer.wordpress.org/files/2014/10/customize-4.6.png 1600w" sizes="(max-width: 640px) 100vw, 640px"></a><p class="wp-caption-text">The customizer as it appears in WordPress 4.6 with the Twenty Fifteen theme.</p></div>
+<p>Customizer options can be granted to users with different capabilities on a granular basis, so while most options are visible only to administrators by default, other users may access certain options if you want them to be able to. Different parts of the Customizer can also be contextual to whether they’re relevant to the front-end context that the user is previewing. For example, the core widgets functionality only shows widget areas that are displayed on the current page; other widget areas are shown when the user navigates to a page that includes them within the Customizer preview window.</p>
+<p>This section contains an overview of the Customize API, including code examples and discussion of best practices. For more details, it is strongly recommended that developers study the core customizer code (all core files containing “customize”). This is considered the canonical, official documentation for the Customize API outside of the inline documentation within the core code.</p>
+<h2></h2>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/functionality/accessibility/" rel="previous"><span class="meta-nav">←</span> Accessibility</a><a href="https://developer.wordpress.org/themes/customize-api/customizer-objects/" rel="next">Customizer Objects <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main id="main" class="site-main post-25000 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>Customizer Objects</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#settings">Settings</a></li>
+<li><a href="#controls">Controls</a>
+<ul>
+<li><a href="#core-custom-controls">Core Custom Controls</a>
+</li></ul></li>
+<li><a href="#sections">Sections</a></li>
+<li><a href="#panels">Panels</a></li>
+<li><a href="#custom-controls-sections-and-panels">Custom Controls, Sections, and Panels</a>
+<ul>
+<li><a href="#customizer-ui-standards">Customizer UI Standards</a>
+</li></ul></li>
+<li><a href="#custom-setting-types">Custom Setting Types</a></li></ul>
+</div>
+<div id="attachment_22515" style="width: 371px" class="wp-caption alignnone"><a href="https://developer.wordpress.org/files/2014/10/Customizer-Object-Relationships.png"><img class=" wp-image-22515" src="https://developer.wordpress.org/files/2014/10/Customizer-Object-Relationships-1024x576.png" alt="Customizer object relationships and high-level API structure." width="361" height="203" srcset="https://developer.wordpress.org/files/2014/10/Customizer-Object-Relationships-1024x576.png 1024w, https://developer.wordpress.org/files/2014/10/Customizer-Object-Relationships-300x169.png 300w, https://developer.wordpress.org/files/2014/10/Customizer-Object-Relationships-768x432.png 768w, https://developer.wordpress.org/files/2014/10/Customizer-Object-Relationships.png 1280w" sizes="(max-width: 361px) 100vw, 361px"></a><p class="wp-caption-text">Customizer object relationships and high-level API structure.</p></div>
+<p>The Customize API is object-oriented. There are four main types of Customizer objects: Panels, Sections, Settings, and Controls. Settings associate UI elements (controls) with settings that are saved in the database. Sections are UI containers for controls, to improve their organization. Panels are containers for sections, allowing multiple sections to be grouped together.</p>
+<p>Each Customizer object is represented by a PHP class, and all of the objects are managed by the Customize Manager object, <a href="https://developer.wordpress.org/reference/classes/wp_customize_manager/">WP_Customize_Manager</a>.</p>
+<p>To add, remove, or modify any Customizer object, and to access the Customizer Manager, use the <code><a href="https://developer.wordpress.org/reference/hooks/customize_register/">customize_register</a></code> hook:</p>
+<pre class="brush: php; title: ; notranslate" title="">function themeslug_customize_register( $wp_customize ) {
+  // Do stuff with $wp_customize, the WP_Customize_Manager object.
+}
+add_action( 'customize_register', 'themeslug_customize_register' );</pre>
+<p>The Customizer Manager provides add_, get_, and remove_ methods for each Customizer object type; each works with an id. The get_ methods allow for direct modification of parameters specified when adding a control.</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">add_action('customize_register','my_customize_register');
+function my_customize_register( $wp_customize ) {
+  $wp_customize-&gt;add_panel();
+  $wp_customize-&gt;get_panel();
+  $wp_customize-&gt;remove_panel();
+
+  $wp_customize-&gt;add_section();
+  $wp_customize-&gt;get_section();
+  $wp_customize-&gt;remove_section();
+
+  $wp_customize-&gt;add_setting();
+  $wp_customize-&gt;get_setting();
+  $wp_customize-&gt;remove_setting();
+
+  $wp_customize-&gt;add_control();
+  $wp_customize-&gt;get_control();
+  $wp_customize-&gt;remove_control();
+}
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p>Note: themes generally should not modify core sections and panels with the get methods, since&nbsp;themes should not modify core, theme-agnostic functionality. Plugins are encouraged to use these functions where necessary. Themes should not “reorganize” customizer sections that aren’t added by the theme.</p>
+<h2 class="toc-heading" id="settings" tabindex="-1">Settings <a href="#settings" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Settings</span></a></h2>
+<p>Settings handle live-previewing, saving, and sanitization of your customizer objects. Each setting is managed by a control object. There are several parameters available when adding a new setting:</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_setting( 'setting_id', array(
+  'type' =&gt; 'theme_mod', // or 'option'
+  'capability' =&gt; 'edit_theme_options',
+  'theme_supports' =&gt; '', // Rarely needed.
+  'default' =&gt; '',
+  'transport' =&gt; 'refresh', // or postMessage
+  'sanitize_callback' =&gt; '',
+  'sanitize_js_callback' =&gt; '', // Basically to_json.
+) );</pre>
+<div class="callout callout-alert"><p><span class="screen-reader-text">Alert:</span> <strong id="setting-id-naming-convention-notice">Important:</strong> Do <em>not</em> use a setting ID that looks like <code>widget_*</code>, <code>sidebars_widgets[*]</code>, <code>nav_menu[*]</code>, or <code>nav_menu_item[*]</code>. These setting ID patterns are reserved for widget instances, sidebars, nav menus, and nav menu items respectively. If you need to use “widget” in your setting ID, use it as a suffix instead of a prefix, for example “<code>homepage_widget</code>”.</p>
+</div>
+<p>There are two primary types of settings: options and theme modifications. Options are stored directly in the wp_options table of the WordPress database and apply to the site regardless of the active theme. Themes should rarely if ever add settings of the option type. Theme mods, on the other hand, are specific to a particular theme. Most theme options should be theme_mods. For example, a custom CSS plugin could register a custom theme css setting as a theme_mod, allowing each theme to have a unique set of CSS rules without losing the CSS when switching themes then switching back.</p>
+<div id="attachment_17080" style="width: 650px" class="wp-caption alignnone"><a href="https://developer.wordpress.org/files/2014/10/customize-theme-mods-options.png"><img class="wp-image-17080 size-large" src="https://developer.wordpress.org/files/2014/10/customize-theme-mods-options-1024x574.png" alt="customize-theme-mods-options" width="640" height="359" srcset="https://developer.wordpress.org/files/2014/10/customize-theme-mods-options-1024x574.png 1024w, https://developer.wordpress.org/files/2014/10/customize-theme-mods-options-300x168.png 300w, https://developer.wordpress.org/files/2014/10/customize-theme-mods-options.png 1229w" sizes="(max-width: 640px) 100vw, 640px"></a><p class="wp-caption-text">Theme_mod vs. option setting type example.</p></div>
+<p>It is usually most important to set the default value of the setting as well as its sanitization callback, which will ensure that no unsafe data is stored in the database. Typical theme usage:</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_setting( 'accent_color', array(
+  'default' =&gt; '#f72525',
+  'sanitize_callback' =&gt; 'sanitize_hex_color',
+) );
+</pre>
+<p>Typical plugin usage:</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_setting( 'myplugin_options[color]', array(
+  'type' =&gt; 'option',
+  'capability' =&gt; 'manage_options',
+  'default' =&gt; '#ff2525',
+  'sanitize_callback' =&gt; 'sanitize_hex_color',
+) );
+</pre>
+<p>Note that the Customizer can handle options stored as keyed arrays for settings using the option type. This allows multiple settings to be stored in a single option that isn’t a theme mod. To retrieve and use the values of your Customizer options, use <code><a href="https://developer.wordpress.org/reference/functions/get_theme_mod/">get_theme_mod()</a></code> and <code><a href="https://developer.wordpress.org/reference/functions/get_option/">get_option()</a></code> with the setting id:</p>
+<pre class="brush: php; title: ; notranslate" title="">function my_custom_css_output() {
+  echo '&lt;style type="text/css" id="custom-theme-css"&gt;' .
+  get_theme_mod( 'custom_theme_css', '' ) . '&lt;/style&gt;';
+  echo '&lt;style type="text/css" id="custom-plugin-css"&gt;' .
+  get_option( 'custom_plugin_css', '' ) . '&lt;/style&gt;';
+}
+add_action( 'wp_head', 'my_custom_css_output');
+</pre>
+<p>Note that the second argument for <code><a href="https://developer.wordpress.org/reference/functions/get_theme_mod/">get_theme_mod()</a></code> and <code><a href="https://developer.wordpress.org/reference/functions/get_option/">get_option()</a></code> is the default value, which should match the default you set when adding&nbsp;the setting.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="controls" tabindex="-1">Controls <a href="#controls" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Controls</span></a></h2>
+<p>Controls are the primary Customizer object for creating UI. &nbsp;Specifically, every control must be associated with a setting, and that setting will save user-entered data from the control to the database (in addition to displaying it in the live-preview and sanitizing it).&nbsp;Controls can be added by the Customizer Manager and provide a robust set of UI options with minimal effort:</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_control( 'setting_id', array(
+  'type' =&gt; 'date',
+  'priority' =&gt; 10, // Within the section.
+  'section' =&gt; 'colors', // Required, core or custom.
+  'label' =&gt; __( 'Date' ),
+  'description' =&gt; __( 'This is a date control with a red border.' ),
+  'input_attrs' =&gt; array(
+    'class' =&gt; 'my-custom-class-for-js',
+    'style' =&gt; 'border: 1px solid #900',
+    'placeholder' =&gt; __( 'mm/dd/yyyy' ),
+  ),
+  'active_callback' =&gt; 'is_front_page',
+) );</pre>
+<p>The most important parameter when adding a control is its type — this determines what type of UI the Customizer will display. Core provides several built-in control types:</p>
+<ul>
+<li><code>&lt;input&gt;</code>&nbsp;elements with any allowed type (see below)</li>
+<li><code>checkbox</code></li>
+<li><code>textarea</code></li>
+<li><code>radio</code> (pass a keyed array of values =&gt; labels to the <code>choices</code> argument)</li>
+<li><code>select</code> (pass a keyed array of values =&gt; labels to the <code>choices</code> argument)</li>
+<li><code>dropdown-pages</code> (use the <code>allow_addition</code>&nbsp;argument to allow users to add new pages from the control)</li>
+</ul>
+<p>For any input type supported by the html <code>input</code> element, simply pass the type attribute value to the type parameter when adding the control. This allows support for control types such as <code>text</code>, <code>hidden</code>, <code>number</code>, <code>range</code>, <code>url</code>, <code>tel</code>, <code>email</code>, <code>search</code>, <code>time</code>, <code>date</code>, <code>datetime</code>, and <code>week</code>, pending browser support.</p>
+<p>Controls must be added to a section before they will be displayed (and sections must contain controls to be displayed). This is done by specifying the section parameter when adding the control. Here is an example for adding a basic textarea control:</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_control( 'custom_theme_css', array(
+  'label' =&gt; __( 'Custom Theme CSS' ),
+  'type' =&gt; 'textarea',
+  'section' =&gt; 'custom_css',
+) );
+</pre>
+<p>And here’s an example of a basic range (slider) control. Note that most browsers will not display the numeric value of this control because the range input type is designed for settings where the exact value is unimportant. If the numeric value&nbsp;is important, consider using the number type. The <code>input_attrs</code> parameter will map a keyed array of attributes =&gt; values to attributes on the input element, and can be used for purposes ranging from placeholder text to <code>data-</code> JavaScript-referenced data in custom scripts. For number and range controls, it allows us to set the minimum, maximum, and step values.</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_control( 'setting_id', array(
+  'type' =&gt; 'range',
+  'section' =&gt; 'title_tagline',
+  'label' =&gt; __( 'Range' ),
+  'description' =&gt; __( 'This is the range control description.' ),
+  'input_attrs' =&gt; array(
+    'min' =&gt; 0,
+    'max' =&gt; 10,
+    'step' =&gt; 2,
+  ),
+) );
+</pre>
+<h3 class="toc-heading" id="core-custom-controls" tabindex="-1">Core Custom Controls <a href="#core-custom-controls" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Core Custom Controls</span></a></h3>
+<p>If none of the basic control types suit your needs, you can easily create and add custom controls. Custom controls are explained more fully later in this post, but they are essentially subclasses of the base&nbsp;<code><a href="https://developer.wordpress.org/reference/classes/wp_customize_control/">WP_Customize_Control</a></code> object that allow any arbitrary html markup and functionality that you might need. Core features several built-in custom controls that allow developers to implement rich JavaScript-driven features with ease. A color picker control can be added as follows:</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_control( new WP_Customize_Color_Control( $wp_customize, 'color_control', array(
+  'label' =&gt; __( 'Accent Color', 'theme_textdomain' ),
+  'section' =&gt; 'media',
+) ) );
+</pre>
+<p>WordPress 4.1 and 4.2 also added support for any type of multimedia content, with the Media control. The media control implements the native WordPress media manager, allowing users to select files from their library or upload new ones. By specifying the <code>mime_type</code> parameter when adding the control, you can instruct the media library show to a specific type such as images or audio:</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_control( new WP_Customize_Media_Control( $wp_customize, 'image_control', array(
+  'label' =&gt; __( 'Featured Home Page Image', 'theme_textdomain' ),
+  'section' =&gt; 'media',
+  'mime_type' =&gt; 'image',
+) ) );
+</pre>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_control( new WP_Customize_Media_Control( $wp_customize, 'audio_control', array(
+  'label' =&gt; _( 'Featured Home Page Recording', 'theme_textdomain' ),
+  'section' =&gt; 'media',
+  'mime_type' =&gt; 'audio',
+) ) );
+</pre>
+<p>Note that settings associated with <code>WP_Customize_Media_Control </code>save the associated attachment ID, while all other media-related controls (children of <code>WP_Customize_Upload_Control</code>) save the media file URL to the setting. <a href="https://make.wordpress.org/core/2015/07/16/new-customizer-media-controls-in-4-3-and-4-2/">More information</a> is available on Make WordPress Core.</p>
+<p>Additionally, WordPress 4.3 introduced the <code>WP_Customize_Cropped_Image_Control</code>, which provides an interface for&nbsp;cropping an image after selecting it. This is useful for instances where a particular aspect ratio is needed.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="sections" tabindex="-1">Sections <a href="#sections" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Sections</span></a></h2>
+<p>Sections are UI containers for Customizer controls. While you can add custom controls to the core sections, if you have more than a few options you may want to add one or more custom sections. Use the&nbsp;<code><a href="https://developer.wordpress.org/reference/classes/wp_customize_manager/add_section/">add_section</a></code> method of the <a href="https://developer.wordpress.org/reference/classes/wp_customize_manager/">WP_Customize_Manager</a> object to add a new section:</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_section( 'custom_css', array(
+  'title' =&gt; __( 'Custom CSS' ),
+  'description' =&gt; __( 'Add custom CSS here' ),
+  'panel' =&gt; '', // Not typically needed.
+  'priority' =&gt; 160,
+  'capability' =&gt; 'edit_theme_options',
+  'theme_supports' =&gt; '', // Rarely needed.
+) );
+</pre>
+<p>You only need to include fields that you want to override the default values of. For example, the default priority (order of appearance) is typically acceptable, and most sections shouldn’t require descriptive text if your options are self-explanatory. If you do want to change the location of your custom section, the priorities of the core sections are below:</p>
+<table>
+<thead>
+<tr>
+<td>Title</td>
+<td>ID</td>
+<td>Priority (Order)</td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Site Title &amp; Tagline</td>
+<td>title_tagline</td>
+<td>20</td>
+</tr>
+<tr>
+<td>Colors</td>
+<td>colors</td>
+<td>40</td>
+</tr>
+<tr>
+<td>Header Image</td>
+<td>header_image</td>
+<td>60</td>
+</tr>
+<tr>
+<td>Background Image</td>
+<td>background_image</td>
+<td>80</td>
+</tr>
+<tr>
+<td>Menus (Panel)</td>
+<td>nav_menus</td>
+<td>100</td>
+</tr>
+<tr>
+<td>Widgets (Panel)</td>
+<td>widgets</td>
+<td>110</td>
+</tr>
+<tr>
+<td>Static Front Page</td>
+<td>static_front_page</td>
+<td>120</td>
+</tr>
+<tr>
+<td><i>default</i></td>
+<td></td>
+<td>160</td>
+</tr>
+<tr>
+<td>Additional CSS</td>
+<td>custom_css</td>
+<td>200</td>
+</tr>
+</tbody>
+</table>
+<p>In most cases, sections can be added with only one or two parameters being specified. Here’s an example for adding a section for options that pertain to a theme’s footer:</p>
+<pre class="brush: php; title: ; notranslate" title="">// Add a footer/copyright information section.
+$wp_customize-&gt;add_section( 'footer' , array(
+  'title' =&gt; __( 'Footer', 'themename' ),
+  'priority' =&gt; 105, // Before Widgets.
+) );</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="panels" tabindex="-1">Panels <a href="#panels" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Panels</span></a></h2>
+<p>The Customizer Panels API was introduced in WordPress 4.0, and allows developers to create an additional layer of hierarchy beyond controls and sections. More than simply grouping sections of controls, panels are designed to provide distinct contexts for the Customizer, such as Customizing Widgets, Menus, or perhaps in the future, editing posts. There is an important technical distinction between the section and panel objects.</p>
+<p><strong>Themes should not register their own panels in most cases</strong>. Sections do <em>not</em> need to be nested under a panel, and each section should generally contain multiple controls. Controls should also be added&nbsp;to the Sections that core provides, such as adding&nbsp;color options to&nbsp;the colors Section. Also make sure that your options are as streamlined and efficient as possible; see the <a href="https://wordpress.org/about/philosophy/">WordPress philosophy</a>. Panels are designed as contexts for entire features such as Widgets, Menus, or Posts, not as wrappers for generic sections. If you absolutely must&nbsp;use Panels, you’ll find that the API is nearly identical to that for Sections:</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_panel( 'menus', array(
+  'title' =&gt; __( 'Menus' ),
+  'description' =&gt; $description, // Include html tags such as &lt;p&gt;.
+  'priority' =&gt; 160, // Mixed with top-level-section hierarchy.
+) );
+$wp_customize-&gt;add_section( $section_id , array(
+  'title' =&gt; $menu-&gt;name,
+  'panel' =&gt; 'menus',
+) );</pre>
+<p>Panels must contain at least one Section, which must contain at least one Control, to be displayed. As you can see in the above example, Sections can be added to Panels similarly to how Controls are added to Sections. However, unlike with controls, if the&nbsp;Panel parameter is empty when registering a&nbsp;Section, it will be displayed on the main, top-level Customizer context, as most sections should not be contained with a panel.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="custom-controls-sections-and-panels" tabindex="-1">Custom Controls, Sections, and Panels <a href="#custom-controls-sections-and-panels" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Custom Controls, Sections, and Panels</span></a></h2>
+<p>Custom Controls, Sections, and Panels can be easily created by subclassing the PHP objects associated with each Customizer object:&nbsp;<code><a href="https://developer.wordpress.org/reference/classes/wp_customize_control/">WP_Customize_Control</a></code>,&nbsp;<code><a href="https://developer.wordpress.org/reference/classes/wp_customize_section/">WP_Customize_Section</a></code>, and&nbsp;<code><a href="https://developer.wordpress.org/reference/classes/wp_customize_panel/">WP_Customize_Panel</a></code> (this can also be done for <code><a href="https://developer.wordpress.org/reference/classes/wp_customize_setting/">WP_Customize_Setting</a></code>, but custom settings are typically better implemented using custom setting types, as outlined in the next section). Here’s an example for a basic custom control:</p>
+<pre class="brush: php; title: ; notranslate" title="">class WP_New_Menu_Customize_Control extends WP_Customize_Control {
+  public $type = 'new_menu';
+  /**
+  * Render the control's content.
+  */
+  public function render_content() {
+  ?&gt;
+    &lt;button class="button button-primary" id="create-new-menu-submit" tabindex="0"&gt;&lt;?php _e( 'Create Menu' ); ?&gt;&lt;/button&gt;
+  &lt;?php
+  }
+}
+</pre>
+<p>By subclassing the base control class, you can override any functionality with custom functionality or use the core functionality depending on your needs. The most common function to override is <code>render_content()</code> as it allows you to create custom UI from scratch with HTML. Custom Controls should be used with caution, however, as they may introduce UI that is inconsistent with the surrounding core UI and cause confusion for users. Custom Customizer objects can be added similarly to how default controls, sections, and panels are added:</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_control(
+  new WP_Customize_Color_Control(
+    $wp_customize, // WP_Customize_Manager
+    'accent_color', // Setting id
+    array( // Args, including any custom ones.
+      'label' =&gt; __( 'Accent Color' ),
+      'section' =&gt; 'colors',
+    )
+  )
+);
+</pre>
+<p>Parameters passed when adding controls are mapped to class variables within the control class, so you can add and use custom ones where certain parts of your custom object are different across different instances.</p>
+<p>When creating custom Controls, Sections, or Panels, it is strongly recommended to reference the core code, in order to fully understand the available functionality that can be overridden. Core also includes examples of custom objects of each type. This can be found in <a href="https://core.trac.wordpress.org/browser/trunk/src/wp-includes/class-wp-customize-control.php">wp-includes/class-wp-customize-control.php</a>, <a href="https://core.trac.wordpress.org/browser/trunk/src/wp-includes/class-wp-customize-section.php">wp-includes/class-wp-customize-section.php</a>, and <a href="https://core.trac.wordpress.org/browser/trunk/src/wp-includes/class-wp-customize-panel.php">wp-includes/class-wp-customize-panel.php</a>. There is also a JavaScript API for each Customizer object type, which can be extended with custom objects; see the Customizer JavaScript API section for more details.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="customizer-ui-standards" tabindex="-1">Customizer UI Standards <a href="#customizer-ui-standards" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Customizer UI Standards</span></a></h3>
+<p>Custom customizer controls, sections, and panels should match core UI practices wherever possible. This includes relying on standards from wp-admin, such as using the <code>.button</code>&nbsp;and <code>.button-primary</code>&nbsp;classes, for example. There are also a few standards specific to the customizer (as of WordPress 4.7):</p>
+<ul>
+<li>White background colors are used <em>only</em> to indicate navigation and actionable items (such as inputs)</li>
+<li>The general <code>#eee</code>&nbsp;background color provides&nbsp;visual contrast against the white elements</li>
+<li><code>1px #ddd</code>&nbsp;borders separate navigational elements from background margins and from each other</li>
+<li><code>15px</code>&nbsp;of spacing is provided between elements where visual separation is desired</li>
+<li><code>4px</code>&nbsp;borders are used on one side of a navigation element to show hover or focus, with a color of <code>#0073aa</code></li>
+<li>Customizer text uses&nbsp;<code>color: #555d66</code>, with <code>#0073aa</code>&nbsp;for&nbsp;hover and focus states on navigation elements</li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="custom-setting-types" tabindex="-1">Custom Setting Types <a href="#custom-setting-types" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Custom Setting Types</span></a></h2>
+<p>By default, the Customizer supports saving settings as options or theme modifications. But this behavior can be easily overwritten to manually save and preview settings&nbsp;outside of the wp_options table of the WordPress database, or to apply other custom handling. To get started, specify a type other than option or theme_mod when adding your setting (you can use pretty much any string):</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_setting( $nav_menu_setting_id, array(
+  'type' =&gt; 'nav_menu',
+  'default' =&gt; $item_ids,
+) );
+</pre>
+<p>The setting will no longer be saved or previewed when its value is changed in the associated control. Now, you can use the <code>customize_update_$setting-&gt;type </code>and<code> customize_preview_$setting-&gt;type</code> actions to implement custom saving and previewing functionality. Here is an example for saving a menu item’s order property from the Menu Customizer project (the value of the setting is an ordered array of menu ids):</p>
+<pre class="brush: php; title: ; notranslate" title="">function menu_customizer_update_nav_menu( $value, $setting ) {
+  $menu_id = str_replace( 'nav_menu_', '', $setting-&gt;id );
+  // ...
+  $i = 0;
+  foreach( $value as $item_id ) { // $value is ordered array of item ids.
+    menu_customizer_update_menu_item_order( $menu_id, $item_id, $i );
+  $i++;
+  }
+}
+add_action( 'customize_update_nav_menu', 'menu_customizer_update_nav_menu', 10, 2 );
+</pre>
+<p>And here is how the same plugin implements previewing for nav menu items (note that this example requires PHP 5.3 or higher):</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">function menu_customizer_preview_nav_menu( $setting ) {
+  $menu_id = str_replace( 'nav_menu_', '', $setting-&gt;id );
+  add_filter( 'wp_get_nav_menu_items', function( $items, $menu, $args ) use ( $menu_id, $setting ) {
+    $preview_menu_id = $menu-&gt;term_id;
+    if ( $menu_id == $preview_menu_id ) {
+      $new_ids = $setting-&gt;post_value();
+      foreach ( $new_ids as $item_id ) {
+        $item = wp_setup_nav_menu_item( $item );
+        $item-&gt;menu_order = $i;
+        $new_items[] = $item;
+        $i++;
+      }
+      return $new_items;
+    } else {
+      return $items;
+    }
+  }, 10, 3 );
+}
+add_action( 'customize_preview_nav_menu', 'menu_customizer_preview_nav_menu', 10, 2 );
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/customize-api/" rel="previous"><span class="meta-nav">←</span> Theme Options – The Customizer API</a><a href="https://developer.wordpress.org/themes/customize-api/tools-for-improved-user-experience/" rel="next">Tools for Improved User Experience <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main id="main" class="site-main post-25005 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>Tools for Improved User Experience</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#contextual-controls-sections-and-panels">Contextual Controls, Sections, and Panels</a></li>
+<li><a href="#selective-refresh-fast-accurate-updates">Selective Refresh: Fast, Accurate Updates</a>
+<ul>
+<li><a href="#registering-partials">Registering Partials</a></li>
+<li><a href="#selective-refresh-javascript-events">Selective Refresh JavaScript Events</a></li>
+<li><a href="#widgets-opting-in-to-selective-refresh">Widgets: Opting-In To Selective Refresh</a>
+<ul>
+<li><a href="#theme-support-in-sidebars">Theme Support In Sidebars</a></li>
+<li><a href="#widget-support">Widget Support</a></li>
+<li><a href="#javascript-driven-widget-support">JavaScript-Driven Widget Support</a>
+</li></ul></li>
+<li><a href="#using-postmessage-for-improved-setting-previewing">Using PostMessage For Improved Setting Previewing</a></li>
+<li><a href="#setting-validation">Setting Validation</a>
+<ul>
+<li><a href="#validating-settings%c2%a0in-php">Validating Settings&nbsp;in PHP</a></li>
+<li><a href="#client-side-validation">Client-side Validation</a>
+</li></ul></li>
+<li><a href="#notifications">Notifications</a></li></ul>
+</li></ul></div>
+<h2 class="toc-heading" id="contextual-controls-sections-and-panels" tabindex="-1">Contextual Controls, Sections, and Panels <a href="#contextual-controls-sections-and-panels" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Contextual Controls, Sections, and Panels</span></a></h2>
+<p>WordPress 4.0 and 4.1 also added support for making parts of the Customizer UI be visible or hidden depending on the part of the site that the user was previewing within the Customizer preview window.&nbsp;A simple contextual control example would be that your theme only displays the header image and the site tagline on the front page. This is a perfect use case for the Customizer Manager’s get_ methods, as we can modify the core controls for these settings directly to make them contextual to the front page:</p>
+<pre class="brush: php; title: ; notranslate" title="">// Hide core sections/controls when they aren't used on the current page.
+$wp_customize-&gt;get_section( 'header_image' )-&gt;active_callback = 'is_front_page';
+$wp_customize-&gt;get_control( 'blogdescription' )-&gt;active_callback = 'is_front_page';
+</pre>
+<div style="width: 858px" class="wp-caption alignnone"><img class="" src="//i0.wp.com/nick.halsey.co/wp-content/uploads/sites/2/2014/08/contextual-customize-controls.gif" alt="" width="848" height="525"><p class="wp-caption-text">In this contextual control example, the theme only displays the site tagline on the front page, so the corresponding field in the Customizer is hidden when the user navigates to a different page within the preview window.</p></div>
+<p>The <code>active_callback</code> parameter for Panels, Sections, and Controls takes a callback function name, either core or custom. This parameter can also be set when registering the object for objects&nbsp;that you add. Here’s an example from the Twenty Fourteen Theme:</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_section( 'featured_content', array(
+  'title'       =&gt; __( 'Featured Content', 'twentyfourteen' ),
+  'description' =&gt; //...
+  'priority'        =&gt; 130,
+  'active_callback' =&gt; 'is_front_page',
+) );
+</pre>
+<p>In the previous example, <code><a href="https://developer.wordpress.org/reference/functions/is_front_page/">is_front_page</a></code> is used directly. But for more complex logic, such as checking if the current view is a page (or even a specific page, by id), custom functions can be used (see <a href="https://core.trac.wordpress.org/ticket/30251">#30251</a> for details on why this is needed). If you don’t need to support PHP 5.2, this can be done inline:</p>
+<pre class="brush: php; title: ; notranslate" title="">'active_callback' =&gt; function () { return is_page(); }
+</pre>
+<p>PHP 5.2 support is as simple as creating a named function and referencing it with the active_callback parameter:</p>
+<pre class="brush: php; title: ; notranslate" title="">//...
+'active_callback' =&gt; 'prefix_return_is_page';
+//...
+function prefix_return_is_page() {
+  return is_page();
+}
+</pre>
+<p>Within Custom Controls, Sections, and Panels, there is also an option to override the&nbsp;<code>active_callback</code> function directly within the custom Customizer object class:</p>
+<pre class="brush: php; title: ; notranslate" title="">class WP_Customize_Greeting_Control extends WP_Customize_Control {
+  // ...
+  function active_callback() {
+    return is_front_page();
+  }
+}
+</pre>
+<p>Finally, there is a filter that can be used to override all other&nbsp;<code>active_callback</code> behavior:</p>
+<pre class="brush: php; title: ; notranslate" title="">// Hide all controls without a description when previewing single posts.
+function title_tagline_control_filter( $active, $control ) {
+  if ( '' === $control-&gt;description ) {
+    $active = is_singular();
+  }
+  return $active;
+}
+add_filter( 'customize_control_active', 'title_tagline_control_filter', 10, 2 );
+</pre>
+<p>Note that the&nbsp;<code>active_callback</code> API works exactly the same for all of the Customizer object types (Controls, <a href="https://developer.wordpress.org/reference/classes/wp_customize_section/active_callback/">Sections</a>, and <a href="https://developer.wordpress.org/reference/classes/wp_customize_panel/active_callback/">Panels</a>). As an added bonus, sections will automatically be hidden if all of the controls within them are contextually hidden, and the same works for panels.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="selective-refresh-fast-accurate-updates" tabindex="-1">Selective Refresh: Fast, Accurate Updates <a href="#selective-refresh-fast-accurate-updates" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Selective Refresh: Fast, Accurate Updates</span></a></h2>
+<p>Introduced in WordPress 4.5, Selective Refresh updates in&nbsp;the Customizer “preview” only refresh areas whose associate settings are changed. By only updating the elements that have changed, it’s much faster and less disruptive than a full-iframe refresh. Some other benefits, as noted in <a href="https://make.wordpress.org/core/2016/02/16/selective-refresh-in-the-customizer">Selective Refresh In The Customizer</a>, are:</p>
+<ul>
+<li>Don’t Repeat Yourself (DRY) logic</li>
+<li>Accurate preview update</li>
+<li>Association between parts of the preview and associated settings and controls, along with&nbsp;visible edit shortcuts <a href="https://make.wordpress.org/core/2016/11/10/visible-edit-shortcuts-in-the-customizer-preview/">as of WordPress 4.7</a></li>
+</ul>
+<p>The logic in pure-JavaScript <code>postMessage</code> updates is duplicated. The JavaScript in the Customizer must mirror the PHP that produces the markup, or take shortcuts to approximate it.&nbsp;But Selective Refresh is <abbr title="Don't Repeat Yourself">DRY</abbr>&nbsp;as there’s no duplication of JavaScript and PHP. An Ajax request retrieves the new markup for the preview.</p>
+<p>And because of this Ajax call, the refresh is <strong>accurate</strong>. It uses the filters that can alter the markup. It shows the same result that appears on the front end.</p>
+<p>Additionally, selective refresh partials provide an association between areas of the preview and their corresponding settings. The customizer leverages this relationship to provide visible edit shortcuts that help users find controls associated with a particular part of their site. In the future the partials API could expand to facilitate editing settings directly within the preview and to include a structured JS API for previewing settings with partials.</p>
+<p>For these reasons, all settings are strongly recommended to leverage selective refresh transport for improved user experience, with the option of providing additional&nbsp;JavaScript-based transport&nbsp;to further enhance setting previewing.</p>
+<h3 class="toc-heading" id="registering-partials" tabindex="-1">Registering Partials <a href="#registering-partials" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Registering Partials</span></a></h3>
+<p>Setting previews need to opt-in to use Selective Refresh by registering the necessary partials. In this example, largely taken from the them <a href="https://wordpress.org/themes/twentysixteen">Twenty Sixteen</a>, Selective Refresh is added for the <code>blogdescription</code> setting by adding a partial with the same name.</p>
+<pre class="brush: php; title: ; notranslate" title="">function foo_theme_customize_register( WP_Customize_Manager $wp_customize ) {
+    $wp_customize-&gt;selective_refresh-&gt;add_partial( 'blogdescription', array(
+        'selector' =&gt; '.site-description',
+        'container_inclusive' =&gt; false,
+        'render_callback' =&gt; function() {
+            bloginfo( 'description' );
+        },
+    ) );
+}
+add_action( 'customize_register', 'foo_theme_customize_register' );
+</pre>
+<p>If the <code>settings</code> argument is not supplied, it defaults to be the same as the partial ID, in the same way as the settings for controls default to the control ID. Here are some of the key arguments for partials:</p>
+<table>
+<thead>
+<tr>
+<td><strong>Variable</strong></td>
+<td><strong>Type</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>settings</code></td>
+<td>array</td>
+<td>Setting IDs associated with the partial.</td>
+</tr>
+<tr>
+<td><code>selector</code></td>
+<td>string</td>
+<td>Targets the element(s) in the page markup to be refreshed.</td>
+</tr>
+<tr>
+<td><code>container_inclusive</code></td>
+<td>boolean</td>
+<td>If true, a refresh replaces the entire container. Otherwise, it only replaces the container’s children. Defaults to false.</td>
+</tr>
+<tr>
+<td><code>render_callback</code></td>
+<td>function</td>
+<td>Produces the markup to be rendered on refresh.</td>
+</tr>
+<tr>
+<td><code>fallback_refresh</code></td>
+<td>bool</td>
+<td>Whether or not a full page refresh should occur if the partial is not found in the document.</td>
+</tr>
+</tbody>
+</table>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="selective-refresh-javascript-events" tabindex="-1">Selective Refresh JavaScript Events <a href="#selective-refresh-javascript-events" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Selective Refresh JavaScript Events</span></a></h3>
+<p>These fire on <code>wp.customize.selectiveRefresh</code>:</p>
+<ul>
+<li><code>partial-content-rendered</code><br>
+When the placement is rendered. As mentioned, JavaScript-driven widgets can re-build on this event.</li>
+<li><code>render-partials-response</code><br>
+When data is returned, after a request for partial rendering. The server filters this data with ‘customize_render_partials_response’.</li>
+<li><code>partial-content-moved</code><br>
+When a widget has moved in its sidebar. As shown above, JavaScript-driven widgets can refresh on this event.</li>
+<li><code>widget-updated</code><br>
+When the <code>WidgetPartial</code> is refreshed with its <code>renderContent</code> method.</li>
+<li><code>sidebar-updated</code><br>
+When a sidebar has a widget that’s refreshed or updated. Or when a sidebar’s widgets are sorted, using <code>reflowWidgets()</code>.</li>
+</ul>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="widgets-opting-in-to-selective-refresh" tabindex="-1">Widgets: Opting-In To Selective Refresh <a href="#widgets-opting-in-to-selective-refresh" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Widgets: Opting-In To Selective Refresh</span></a></h3>
+<p>Both themes and widgets <strong>need to opt-in</strong> to use Selective Refresh. All core widgets and themes have already enabled this.</p>
+<h4 class="toc-heading" id="theme-support-in-sidebars" tabindex="-1">Theme Support In Sidebars <a href="#theme-support-in-sidebars" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Theme Support In Sidebars</span></a></h4>
+<p>In order to allow partial refreshes of widgets in a theme’s sidebars:</p>
+<pre class="brush: php; title: ; notranslate" title="">add_theme_support( 'customize-selective-refresh-widgets' );
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h4 class="toc-heading" id="widget-support" tabindex="-1">Widget Support <a href="#widget-support" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Widget Support</span></a></h4>
+<p>Even if a theme supports Selective Refresh, widgets also have to opt-in. All core widgets have already enabled it. Here’s an example widget adding support for Selective Refresh:</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">class Foo_Widget extends WP_Widget {
+
+    public function __construct() {
+        parent::__construct(
+            ‘foo’,
+            __( 'Example', 'bar-plugin' ),
+            array(
+                'description' =&gt; __( ‘An example widget’, ‘bar-plugin’ ),
+                'customize_selective_refresh' =&gt; true,
+            )
+        );
+
+        if ( is_active_widget( false, false, $this-&gt;id_base ) || is_customize_preview() ) {
+            add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        }
+    }
+    ...
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p>Line 9 above enables Selective Refresh:</p>
+<pre class="brush: php; title: ; notranslate" title="">'customize_selective_refresh' =&gt; true,
+</pre>
+<p>Line 13 above ensures the widget’s stylesheet always appears in Customizer sessions. Adding the widget won’t cause a full-page refresh to retrieve the styling:</p>
+<pre class="brush: php; title: ; notranslate" title="">if ( is_active_widget( false, false, $this-&gt;id_base ) || is_customize_preview() ) {
+    add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+}
+</pre>
+<p>See <a href="https://make.wordpress.org/core/2016/03/22/implementing-selective-refresh-support-for-widgets/">Implementing Selective Refresh Support for Widgets</a>.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h4 class="toc-heading" id="javascript-driven-widget-support" tabindex="-1">JavaScript-Driven Widget Support <a href="#javascript-driven-widget-support" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">JavaScript-Driven Widget Support</span></a></h4>
+<p>Widgets that rely on JavaScript for their markup will need additional steps, as shown in <a href="https://make.wordpress.org/core/2016/03/22/implementing-selective-refresh-support-for-widgets/">Implementing Selective Refresh Support for Widgets</a>:</p>
+<ol>
+<ol>
+<li>Enqueue any JavaScript files based on <code>is_customize_preview()</code>, as shown above for stylesheets.</li>
+<li>Add a handler for the <code>partial-content-rendered</code> event, and refresh the widget as needed:</li>
+</ol>
+</ol>
+<pre class="brush: jscript; title: ; notranslate" title="">wp.customize.selectiveRefresh.bind( 'partial-content-rendered', function( placement ) {
+    // logic to refresh
+} );
+</pre>
+<ol>
+<ol>
+<li>If the widget includes an iframe, add a handler to refresh the partial:</li>
+</ol>
+</ol>
+<pre class="brush: jscript; title: ; notranslate" title="">wp.customize.selectiveRefresh.bind( 'partial-content-moved', function( placement ) {
+    // logic to refresh, perhaps conditionally
+}
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="using-postmessage-for-improved-setting-previewing" tabindex="-1">Using PostMessage For Improved Setting Previewing <a href="#using-postmessage-for-improved-setting-previewing" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Using PostMessage For Improved Setting Previewing</span></a></h2>
+<p>The Customizer automatically handles previewing all settings out-of-the-box. This is done by silently reloading the entire preview window, with settings being filtered by PHP in that Ajax call. While this works just fine, it can be very slow since the entire front-end must be reloaded for every&nbsp;single setting change. Selective Refresh improves this experience by refreshing only the elements that have changed, but due to the Ajax call, there is still a delay in seeing the changes in the preview.</p>
+<p>To further improve the&nbsp;user experience, the Customizer offers an API for managing setting changes directly in JavaScript, allowing for truly-live previewing. The below images show a comparison of a Custom CSS option that leverages this technology, called <code>postMessage</code>, versus&nbsp;the standard refresh option:</p>
+<div style="width: 292px" class="wp-caption alignright"><img class="" src="//i0.wp.com/nick.halsey.co/wp-content/uploads/sites/2/2014/08/customize-setting-postmessage.gif" alt="" width="282" height="260"><p class="wp-caption-text">Custom CSS setting in the Customizer with the postMessage setting transport.</p></div>
+<div style="width: 291px" class="wp-caption alignnone"><img class="" src="//i0.wp.com/nick.halsey.co/wp-content/uploads/sites/2/2014/08/customize-setting-refresh-1.gif" alt="" width="281" height="266"><p class="wp-caption-text">Custom CSS setting in the Customizer with the default refresh setting transport.</p></div>
+<p>To use postMessage, first set the transport parameter to postMessage when adding your setting. Many themes also modify core settings such as the title and tagline to leverage postMessage by modifying the transport property of those settings:</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;get_setting( 'blogname' )-&gt;transport        = 'postMessage';
+$wp_customize-&gt;get_setting( 'blogdescription' )-&gt;transport = 'postMessage';
+</pre>
+<p>Once the setting’s transport is set to postMessage, the setting will no longer trigger a refresh of the preview when its value changes. To implement the JavaScript to update the setting within the preview of the front-end, first create and enqueue a JavaScript file:</p>
+<pre class="brush: php; title: ; notranslate" title="">function my_preview_js() {
+  wp_enqueue_script( 'custom_css_preview', 'path/to/file.js', array( 'customize-preview', 'jquery' ) );
+}
+add_action( 'customize_preview_init', 'my_preview_js' );
+</pre>
+<p>Your JavaScript file should look something like this:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">( function( $ ) {
+  wp.customize( 'setting_id', function( value ) {
+    value.bind( function( to ) {
+      $( '#custom-theme-css' ).html( to );
+    } );
+  } );
+  wp.customize( 'custom_plugin_css', function( value ) {
+    value.bind( function( to ) {
+      $( '#custom-plugin-css' ).html( to );
+    } );
+  } );
+} )( jQuery );
+</pre>
+<p>Note that you don’t necessarily need to be great with JavaScript to use postMessage – most of the code is boilerplate. The types of settings that benefit most from postMessage transport require simple JS changes such as using jQuery’s .html() or .text() methods, or swapping out a class on the <code>&lt;body&gt;</code> or another element to trigger a different set of CSS rules. Doing this, or&nbsp;simplifying the instant preview logic with fully-accurate changes updating with selective refresh, the user experience can be fast without duplicating all of the PHP logic in JS.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="setting-validation" tabindex="-1">Setting Validation <a href="#setting-validation" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Setting Validation</span></a></h2>
+<p>WordPress 4.6 includes&nbsp;new APIs related to validation of Customizer setting values. The Customizer has had&nbsp;sanitization of setting&nbsp;values since it was introduced. Sanitization involves coercing a value into something safe to persist to the database: common examples are converting a value into an integer or stripping tags from some text input. As such, sanitization&nbsp;is a <em>lossy</em> operation.&nbsp;With the addition of setting validation:</p>
+<ol>
+<li>All modified settings are&nbsp;validated up-front&nbsp;before any of them are saved.</li>
+<li>If&nbsp;any setting is invalid, the Customizer&nbsp;save request is rejected: a save thus becomes <em>transactional</em>&nbsp;with all&nbsp;the settings left dirty to try saving again.&nbsp;(The Customizer&nbsp;<a href="https://make.wordpress.org/core/2015/01/26/customizer-transactions-proposal/">transactions proposal</a>&nbsp;is closely related to setting&nbsp;validation here.)</li>
+<li>Validation error messages are&nbsp;displayed&nbsp;to the user, prompting them to fix their mistake and try again.</li>
+</ol>
+<p>Sanitization and validation are also both part of the REST API infrastructure via <code>WP_REST_Request::sanitize_params()</code>&nbsp;and <code>WP_REST_Request::validate_params()</code>, respectively. A&nbsp;setting’s value goes through validation before it goes through sanitization.</p>
+<p>For more information on the validation behavior, and additional code examples, see <a href="https://make.wordpress.org/core/2016/07/05/customizer-apis-in-4-6-for-setting-validation-and-notifications/">the feature announcement post</a>.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="validating-settings%c2%a0in-php" tabindex="-1">Validating Settings&nbsp;in PHP <a href="#validating-settings%c2%a0in-php" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Validating Settings&nbsp;in PHP</span></a></h3>
+<p>Just as you can supply a <code>sanitize_callback</code>&nbsp;when registering&nbsp;a setting, you can also supply&nbsp;a <code>validate_callback</code>&nbsp;arg:</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; gutter: false; title: ; notranslate" title="">$wp_customize-&gt;add_setting( 'established_year', array(
+    'sanitize_callback' =&gt; 'absint',
+    'validate_callback' =&gt; 'validate_established_year'
+) );
+function validate_established_year( $validity, $value ) {
+    $value = intval( $value );
+    if ( empty( $value ) || ! is_numeric( $value ) ) {
+        $validity-&gt;add( 'required', __( 'You must supply a valid year.' ) );
+    } elseif ( $value &lt; 1900 ) {
+        $validity-&gt;add( 'year_too_small', __( 'Year is too old.' ) );
+    } elseif ( $value &gt; gmdate( 'Y' ) ) {
+        $validity-&gt;add( 'year_too_big', __( 'Year is too new.' ) );
+    }
+    return $validity;
+}
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p>Just as supplying a <code>sanitize_callback</code>&nbsp;arg adds a filter for <code>customize_sanitize_{$setting_id}</code>, so too supplying a <code>validate_callback</code>&nbsp;arg will add a filter for <code>customize_validate_{$setting_id}</code>. Assuming that the <code>WP_Customize_Setting</code>&nbsp;instances apply filters on these in their <code>validate</code>&nbsp;methods,&nbsp;you can add this&nbsp;filter if you need to add validation for settings that have been previously added.</p>
+<p>The <code>validate_callback</code> and any <code>customize_validate_{$setting_id}</code> filter callbacks take a <code>WP_Error</code> instance is its first argument (which initially is empty of any errors added), followed by the <code>$value</code> being sanitized, and lastly the <code>WP_Customize_Setting</code> instance that is being validated.</p>
+<p>Custom setting classes can also override the <code>validate </code>method of the setting class directly.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h3 class="toc-heading" id="client-side-validation" tabindex="-1">Client-side Validation <a href="#client-side-validation" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Client-side Validation</span></a></h3>
+<p>If&nbsp;you have a setting that is previewed purely via JavaScript (and the <code>postMessage</code> transport <em>without</em> selective refresh), you should also add client-side validation.&nbsp;Otherwise, any validation errors will persist until a full refresh happens or a save is attempted. Client-side validation must not take the place of server-side validation, since malicious users could bypass the client-side validation to save an invalid value if corresponding server-side validation is not in place.</p>
+<p>There is a <code>validate</code> method available on the <code>wp.customize.Setting</code> JS class (actually, the <code>wp.customize.Value</code> base class). Its&nbsp;name is a bit misleading, as it actually behaves very similarly to the <code>WP_Customize_Setting::sanitize()</code> PHP method, but it can be used to both sanitize and validate a value in JS. Note that this JS runs in the context of the Customizer <em>pane</em> not the preview, so any such JS should have <code>customize-controls</code> as a dependency (not <code>customize-preview</code>) and enqueued during the <code>customize_controls_enqueue_scripts</code> action. Some example JS validation:</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; gutter: false; title: ; notranslate" title="">wp.customize( 'established_year', function ( setting ) {
+	setting.validate = function ( value ) {
+		var code, notification;
+		var year = parseInt( value, 10 );
+
+		code = 'required';
+		if ( isNaN( year ) ) {
+			notification = new wp.customize.Notification( code, {message: myPlugin.l10n.yearRequired} );
+			setting.notifications.add( code, notification );
+		} else {
+			setting.notifications.remove( code );
+		}
+
+		code = 'year_too_small';
+		if ( year &lt; 1900 ) {
+			notification = new wp.customize.Notification( code, {message: myPlugin.l10n.yearTooSmall} );
+			setting.notifications.add( code, notification );
+		} else {
+			setting.notifications.remove( code );
+		}
+
+		code = 'year_too_big';
+		if ( year &gt; new Date().getFullYear() ) {
+			notification = new wp.customize.Notification( code, {message: myPlugin.l10n.yearTooBig} );
+			setting.notifications.add( code, notification );
+		} else {
+			setting.notifications.remove( code );
+		}
+
+		return value;
+	};
+} );
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="notifications" tabindex="-1">Notifications <a href="#notifications" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Notifications</span></a></h2>
+<p><img class="size-medium wp-image-18662 alignright" src="https://make.wordpress.org/core/files/2016/07/error-notification-300x112.png" alt="Error notification" width="300" height="112">Notifications provide user feedback, typically based on the value of a control’s setting. An error notification is added to a setting’s <code>notifications</code> collection when a setting’s validation routine returns a <code>WP_Error</code> instance. Each error added to a PHP <code>WP_Error</code> instance is represented as a <code>wp.customize.Notification</code> in JavaScript:</p>
+<ul>
+<li>A <code>WP_Error</code>‘s <code>code</code> is available as <code>notification.code</code> in JS.</li>
+<li>A <code>WP_Error</code>‘s <code>message</code> is available as <code>notification.message</code> in JS. Note that if there are multiple messages added to a given error code in PHP they will be concatenated into a single message in JS.</li>
+<li>A <code>WP_Error</code>‘s <code>data</code> is available as <code>notification.data</code> in JS. This is useful to pass additional error context from the server to the client.</li>
+</ul>
+<p>Any time that a <code>WP_Error</code> is returned from a validation routine on the server it will result in a <code>wp.customize.Notification</code> being created with a <code>type</code> property of “error”.</p>
+<p>While setting non-error notifications from PHP is not currently supported (see #37281), you can also add non-error notifications with JS as follows:</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; gutter: false; title: ; notranslate" title="">wp.customize( 'blogname', function( setting ) {
+    setting.bind( function( value ) {
+        var code = 'long_title';
+        if ( value.length &gt; 20 ) {
+            setting.notifications.add( code, new wp.customize.Notification(
+                code,
+                {
+                    type: 'warning',
+                    message: 'This theme prefers title with max 20 chars.'
+                }
+            ) );
+        } else {
+            setting.notifications.remove( code );
+        }
+    } );
+} );
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p>You can also supply “info” as a notification’s <code>type</code>. The default <code>type</code> is “error”. Custom types may also be supplied, and the notifications can be styled with CSS selector matching <code>notice.notice-foo</code> where “foo” is the type supplied. A control may also override the default behavior for how notifications are rendered by overriding the <code>wp.customize.Control.renderNotifications</code> method.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/customize-api/customizer-objects/" rel="previous"><span class="meta-nav">←</span> Customizer Objects</a><a href="https://developer.wordpress.org/themes/customize-api/the-customizer-javascript-api/" rel="next">The Customizer JavaScript API <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main id="main" class="site-main post-25007 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>The Customizer JavaScript API</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#preview-js-and-controls-js">Preview JS and Controls JS</a></li>
+<li><a href="#models-for%c2%a0controls-sections-and-panels">Models for&nbsp;Controls, Sections, and Panels</a></li>
+<li><a href="#relating-controls-sections-and-panels-together">Relating Controls, Sections, and Panels together</a></li>
+<li><a href="#contextual-panels-sections-and-controls">Contextual Panels, Sections, and Controls</a></li>
+<li><a href="#focusing-ui-objects">Focusing UI Objects</a></li>
+<li><a href="#priorities">Priorities</a></li>
+<li><a href="#custom%c2%a0controls-panels-and-sections">Custom&nbsp;Controls, Panels, and Sections</a></li></ul>
+</div>
+<p>In WordPress 4.1, newly-expanded JavaScript APIs were introduced for all customizer objects. The entire JavaScript API is currently located in a single file, <a href="https://core.trac.wordpress.org/browser/trunk/src/wp-admin/js/customize-controls.js">wp-admin/js/customize-controls.js</a>, which contains models for all objects, core custom controls, and more.</p>
+<h2 class="toc-heading" id="preview-js-and-controls-js" tabindex="-1">Preview JS and Controls JS <a href="#preview-js-and-controls-js" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Preview JS and Controls JS</span></a></h2>
+<p>The customizer app is currently split into two distinct areas: the customizer controls “pane” and the customize preview. The preview is currently in an iframe, meaning that all JS runs either in the controls pane or in the preview. The postMessage API is used to communicate between the preview and the controls.</p>
+<p>Most themes only implement JavaScript in the customize preview, and use it to implement instant previewing of settings via postMessage. However, JS on the controls side can be used for many things, such as dynamically showing and hiding controls based on the values of other settings, changing the previewed URL, focusing parts of the preview, and more. Here’s an example from core of controls-side JS that interacts with the preview, in this case changing the previewed URL when the page for posts changes:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">// Change the previewed URL to the selected page when changing the page_for_posts.
+wp.customize( 'page_for_posts', function( setting ) {
+	setting.bind( function( pageId ) {
+		pageId = parseInt( pageId, 10 );
+		if ( pageId &gt; 0 ) {
+			api.previewer.previewUrl.set( api.settings.url.home + '?page_id=' + pageId );
+		}
+	});
+});
+</pre>
+<p>Similar logic can be used to <code>activate</code>&nbsp;UI objects based on the value of a setting. The Twenty Seventeen theme includes some useful examples for leveraging the customize JS API for improved user experience. Note that there is one JS file for the controls pane, named <code>customize-controls.js</code>&nbsp;and one file for the customize preview, named customize-preview.js. For clarity, all themes and plugins are recommended to follow this naming convention, even if customize JS is only provided in the controls or preview but not both.</p>
+<p>The rest of this page is dedicated primarily to the controls-side JS API that was built-out in WordPress 4.1.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="models-for%c2%a0controls-sections-and-panels" tabindex="-1">Models for&nbsp;Controls, Sections, and Panels <a href="#models-for%c2%a0controls-sections-and-panels" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Models for&nbsp;Controls, Sections, and Panels</span></a></h2>
+<p>As in PHP, each Customizer object type has a corresponding object in JavaScript. There are&nbsp;<code>wp.customize.Control,</code>&nbsp;<code>wp.customize.Panel,</code> and <code>wp.customize.Section&nbsp;</code>models, as well as&nbsp;<code>wp.customize.panel,</code>&nbsp;<code>wp.customize.section, and&nbsp;</code><code>wp.customize.control</code> collections (yes, they aresingular) that&nbsp;store all control instances. You&nbsp;can iterate over panels, sections, and controls via:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">wp.customize.panel.each( function ( panel ) { /* ... */ } );
+wp.customize.section.each( function ( section ) { /* ... */ } );
+wp.customize.control.each( function ( control ) { /* ... */ } );
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="relating-controls-sections-and-panels-together" tabindex="-1">Relating Controls, Sections, and Panels together <a href="#relating-controls-sections-and-panels-together" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Relating Controls, Sections, and Panels together</span></a></h2>
+<p>When registering a new control in PHP, you pass in the parent section ID:</p>
+<pre class="brush: php; title: ; notranslate" title="">$wp_customize-&gt;add_control( 'blogname', array(
+  'label' =&gt; __( 'Site Title' ),
+  'section' =&gt; 'title_tagline',
+) );</pre>
+<p>In the JavaScript API, a control’s section can be obtained predictably:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">id = wp.customize.control( 'blogname' ).section(); // returns title_tagline by default</pre>
+<p>To get the section object from the ID, look up the section by the ID as normal: <code>wp.customize.section( id )</code>.</p>
+<p>You can move a control to another section using this <code>section</code> state as well, here moving it to the Navigation section:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">wp.customize.control( 'blogname' ).section( 'nav' );</pre>
+<p>Likewise, you can get a section’s panel ID in the same way:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">id = wp.customize.section( 'sidebar-widgets-sidebar-1' ).panel(); // returns widgets by default</pre>
+<p>You can go the other way as well, to get the children of panels and sections:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">sections = wp.customize.panel( 'widgets' ).sections();
+controls = wp.customize.section( 'title_tagline' ).controls();
+</pre>
+<p>You can use these to move all controls from one section to another:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">_.each( wp.customize.section( 'title_tagline' ).controls(), function ( control ) {
+  control.section( 'nav' );
+});
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="contextual-panels-sections-and-controls" tabindex="-1">Contextual Panels, Sections, and Controls <a href="#contextual-panels-sections-and-controls" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Contextual Panels, Sections, and Controls</span></a></h2>
+<p><code>Control,</code>&nbsp;<code>Panel,</code> and <code>Section</code> instances have an <code>active</code> state (a <code>wp.customize.Value</code> instance). When the <code>active</code> state changes, the panel, section, and control instances invoke their respective <code>onChangeActive</code> method, which by default slides the container element up and down, if <code>false</code> and <code>true</code> respectively. There are also <code>activate()</code> and <code>deactivate()</code> methods now for manipulating this <code>active</code> state, for panels, sections, and controls. The primary purpose of these states is to show or hide the object without removing it entirely from the Customizer.</p>
+<pre class="brush: jscript; title: ; notranslate" title="">wp.customize.section( 'nav' ).deactivate(); // slide up
+wp.customize.section( 'nav' ).activate({ duration: 1000 }); // slide down slowly
+wp.customize.section( 'colors' ).deactivate({ duration: 0 }); // hide immediately
+wp.customize.section( 'nav' ).deactivate({ completeCallback: function () {
+  wp.customize.section( 'colors' ).activate(); // show after nav hides completely
+} });
+</pre>
+<p>Note that manually changing the <code>active</code> state would only stick until the preview refreshes or loads another URL. The <code>activate()</code>/<code>deactivate()</code>&nbsp;methods are designed to follow the pattern of the new <code>expanded</code> state.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="focusing-ui-objects" tabindex="-1">Focusing UI Objects <a href="#focusing-ui-objects" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Focusing UI Objects</span></a></h2>
+<p>Building upon the <code>expand()</code>/<code>collapse()</code> methods for panels, sections, and controls, these models also support a <code>focus()</code> method which not only expands all of the necessary elements, but also scrolls the target container into view and puts the browser focus on the first focusable element in the container. For instance, to expand the “Static Front Page” section and focus on select dropdown for the “Front page”:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">wp.customize.control( 'page_on_front' ).focus()</pre>
+<p>The focus functionality is used to implement <a title="#28650: Allow Customizer elements (controls, sections, and panels) to be deep-linked" href="https://core.trac.wordpress.org/ticket/28650">autofocus</a>: deep-linking to panels, sections, and controls inside of the customizer. Consider these URLs:</p>
+<ul>
+<li>…/wp-admin/customize.php?autofocus[panel]=widgets</li>
+<li>…/wp-admin/customize.php?autofocus[section]=colors</li>
+<li>…/wp-admin/customize.php?autofocus[control]=blogname</li>
+</ul>
+<p>This is&nbsp;used in WordPress core to <a title="#28032: Headers, Backgrounds, and Widgets in the Customizer are not discoverable from their separate admin screens." href="https://core.trac.wordpress.org/ticket/28032">add a link</a> on the widgets admin page to link directly to the widgets panel within the customizer, as well as to connect visible edit shortcuts in the customize preview with the associated controls in the customize pane.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="priorities" tabindex="-1">Priorities <a href="#priorities" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Priorities</span></a></h2>
+<p>When&nbsp;registering a panel, section, or control in PHP, you can supply a <code>priority</code> parameter. This value is stored in a <code>wp.customize.Value</code> instance for each respective <code>Panel</code>, <code>Section</code>, and <code>Control</code> instance. For example, you can obtain the priority for the widgets panel via:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">priority = wp.customize.panel( 'widgets' ).priority(); // returns 110 by default</pre>
+<p>You can then dynamically change the priority and the Customizer UI&nbsp;will automatically re-arrange to reflect the new priorities:</p>
+<pre class="brush: jscript; title: ; notranslate" title="">wp.customize.panel( 'widgets' ).priority( 1 ); // move Widgets to the top</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="custom%c2%a0controls-panels-and-sections" tabindex="-1">Custom&nbsp;Controls, Panels, and Sections <a href="#custom%c2%a0controls-panels-and-sections" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Custom&nbsp;Controls, Panels, and Sections</span></a></h2>
+<p>When working with custom Customizer objects in JS, it is usually easiest to examine the custom objects in WordPress core to understand the code structure. See <a href="https://core.trac.wordpress.org/browser/trunk/src/wp-admin/js/customize-controls.js">wp-admin/js/customize-controls.js</a>, particularly the wp.customize.Panel|Section|Control models. Note several examples in the core code, particularly in the media controls, which build on each others’ functionality though object hierarchy.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/customize-api/tools-for-improved-user-experience/" rel="previous"><span class="meta-nav">←</span> Tools for Improved User Experience</a><a href="https://developer.wordpress.org/themes/customize-api/javascriptunderscore-js-rendered-custom-controls/" rel="next">JavaScript/Underscore.js-Rendered Custom Controls <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main id="main" class="site-main post-25009 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>JavaScript/Underscore.js-Rendered Custom Controls</h1>
+
+
+<style> .toc-jump { text-align: right; font-size: 12px; } .page .toc-heading { margin-top: -50px; padding-top: 50px !important; }</style><div class="table-of-contents"><h2>Topics</h2><ul class="items"><li><a href="#registered-control-types">Registered Control Types</a></li>
+<li><a href="#sending-php-control-data-to-javascript">Sending PHP Control Data to JavaScript</a></li>
+<li><a href="#jsunderscore-templating">JS/Underscore Templating</a></li>
+<li><a href="#putting-the-pieces-together">Putting the pieces together</a></li></ul>
+</div>
+<p>WordPress 4.1 also added support for rendering JavaScript-heavy and/or high-quantity controls entirely with JavaScript. This allows for more dynamic behavior, especially related to dynamically-added controls. The core Color and Media controls currently leverage this API, and all core Controls will eventually use it in the future. The PHP-based control API is not going away, but in the future most controls will likely use the new API since it provides a faster experience for users and developers. Similar&nbsp;APIs for JS-templated Sections and Panels were introduced WordPress 4.3; however, there remain some gaps in the ease of dynamically-creating objects in JS as of WordPress 4.7, see <a href="https://core.trac.wordpress.org/ticket/30741">#30741</a>.</p>
+<h2 class="toc-heading" id="registered-control-types" tabindex="-1">Registered Control Types <a href="#registered-control-types" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Registered Control Types</span></a></h2>
+<p>In order to introduce a concept of having one template for multiple Customizer controls of the same type, we needed to introduce a&nbsp;way to register&nbsp;a type of control with the Customize Manager. Previously, custom control objects were only encountered when custom controls were added using <code><a href="https://developer.wordpress.org/reference/classes/wp_customize_manager/add_control/">WP_Customize_Manager::add_control()</a></code>. But detecting added control types to render one template per type wouldn’t allow new controls to be created dynamically if no other instances of that type were loaded.&nbsp;<code><a href="https://developer.wordpress.org/reference/classes/wp_customize_manager/register_control_type/">WP_Customize_Manager::register_control_type()</a>&nbsp;solves this:</code></p>
+<pre class="brush: php; title: ; notranslate" title="">add_action( 'customize_register', 'prefix_customize_register' );
+function prefix_customize_register( $wp_customize ) {
+  // Define a custom control class, WP_Customize_Custom_Control.
+  // Register the class so that its JS template is available in the Customizer.
+  $wp_customize-&gt;register_control_type( 'WP_Customize_Custom_Control' );
+}
+</pre>
+<p>All registered control types have their templates printed to the customizer by <code>WP_Customize_Manager::print_control_templates()</code>.</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="sending-php-control-data-to-javascript" tabindex="-1">Sending PHP Control Data to JavaScript <a href="#sending-php-control-data-to-javascript" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Sending PHP Control Data to JavaScript</span></a></h2>
+<p>While Customizer control data has always been passed to the control JS models, and this has always been able to be extended, you’re much more likely to need to send data down when working with JS templates. Anything that you would want access to in <code>render_content()</code> in PHP will need to be exported to JavaScript to be accessible in your control template. <code>WP_Customize_Control</code> exports the following control class variables by default:</p>
+<ul>
+<li><code>type</code></li>
+<li><code>label</code></li>
+<li><code>description</code></li>
+<li><code>active</code> (boolean state)</li>
+</ul>
+<p>You can add additional parameters specific to your custom control by overriding <code><a href="https://developer.wordpress.org/reference/classes/wp_customize_control/to_json/">WP_Customize_Control::to_json()</a></code> in your custom control subclass. In most cases, you’ll want to call the parent class’ <code>to_json()</code> method also, to ensure that all core variables are exported as well. Here’s an example from the core color control:</p>
+<pre class="brush: php; title: ; notranslate" title="">public function to_json() {
+  parent::to_json();
+  $this-&gt;json['statuses'] = $this-&gt;statuses;
+  $this-&gt;json['defaultValue'] = $this-&gt;setting-&gt;default;
+}
+</pre>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="jsunderscore-templating" tabindex="-1">JS/Underscore Templating <a href="#jsunderscore-templating" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">JS/Underscore Templating</span></a></h2>
+<p>Once you’ve registered your custom control class as a control type and exported any custom class variables, you can create the template that will render the control UI. You’ll override&nbsp;<code><a href="https://developer.wordpress.org/reference/classes/wp_customize_control/content_template/">WP_Customize_Control::content_template()</a></code> (empty by default) as a replacement for <code><a href="https://developer.wordpress.org/reference/classes/wp_customize_control/render_content/">WP_Customize_Control::render_content()</a></code>. Render content is still called, so be sure to override it with an empty function in your subclass as well.</p>
+<p>Underscore-style custom control templates are very similar to PHP. As more and more of WordPress core becomes JavaScript-driven, these templates are becoming increasingly more common. Some sample template code in core can be found in <a href="https://core.trac.wordpress.org/browser/trunk/src/wp-includes/media-template.php" target="_blank">media</a>, <a href="https://core.trac.wordpress.org/browser/trunk/src/wp-admin/includes/revision.php#L260" target="_blank">revisions</a>, the <a href="https://core.trac.wordpress.org/browser/trunk/src/wp-admin/themes.php#L293" target="_blank">theme browser</a>, and even <a href="https://core.trac.wordpress.org/browser/trunk/src/wp-content/themes/twentyfifteen/inc/customizer.php#L266" target="_blank">in the Twenty Fifteen theme</a>, where a JS template is used to both save the color scheme data and instantly preview color scheme changes in the Customizer. The best way to learn how these templates work is to study similar code in core and, accordingly, here is a brief example:</p>
+<section class="source-content">
+<div class="source-code-container">
+<pre class="brush: php; title: ; notranslate" title="">class WP_Customize_Color_Control extends WP_Customize_Control {
+  public $type = 'color';
+// ...
+  /**
+   * Render a JS template for the content of the color picker control.
+   */
+  public function content_template() {
+    ?&gt;
+    &lt;# var defaultValue = '';
+    if ( data.defaultValue ) {
+      if ( '#' !== data.defaultValue.substring( 0, 1 ) ) {
+        defaultValue = '#' + data.defaultValue;
+      } else {
+        defaultValue = data.defaultValue;
+      }
+      defaultValue = ' data-default-color=' + defaultValue; // Quotes added automatically.
+    } #&gt;
+    &lt;label&gt;
+      &lt;# if ( data.label ) { #&gt;
+        &lt;span class="customize-control-title"&gt;{{{ data.label }}}&lt;/span&gt;
+      &lt;# } #&gt;
+      &lt;# if ( data.description ) { #&gt;
+        &lt;span class="description customize-control-description"&gt;{{{ data.description }}}&lt;/span&gt;
+      &lt;# } #&gt;
+      &lt;div class="customize-control-content"&gt;
+        &lt;input class="color-picker-hex" type="text" maxlength="7" placeholder="&lt;?php esc_attr_e( 'Hex Value' ); ?&gt;" {{ defaultValue }} /&gt;
+      &lt;/div&gt;
+    &lt;/label&gt;
+    &lt;?php
+  }
+}
+</pre>
+</div>
+<p class="source-code-links"><span><a href="#" class="show-complete-source">Expand full source code</a><a href="#" class="less-complete-source">Collapse full source code</a></span></p>
+</section>
+<p>In the above template for the core custom color control, you can see that after the closing PHP tag, we have a JS template. <code></code> notation is used around statements to be evaluated – in most cases, this is used for conditionals. All of the control instance data that we exported to JS is stored in the `data` object, and we can print a variable using double (escaped) or triple (unescaped) brace notation <code>{{ }}</code>. As I said before, the best way to get the hang of writing controls like this is to read through existing examples. <a href="https://core.trac.wordpress.org/browser/trunk/src/wp-includes/class-wp-customize-control.php#L639" target="_blank"><code>WP_Customize_Upload_Control</code> </a>was recently <a href="https://core.trac.wordpress.org/changeset/30309" target="_blank">updated to leverage this API</a> as well, integrating nicely with the way the media manager is implemented, and squeezing a ton of functionality out of a minimal amount of code. If you want some really good practice, try converting some of the other core controls to use this API – and submit patches to core too, of course!</p>
+<p class="toc-jump"><a href="#top">Top ↑</a></p><h2 class="toc-heading" id="putting-the-pieces-together" tabindex="-1">Putting the pieces together <a href="#putting-the-pieces-together" class="anchor"><span aria-hidden="true">#</span><span class="screen-reader-text">Putting the pieces together</span></a></h2>
+<p>Here’s a summary of what’s needed to leverage the new API in a custom customizer control subclass:</p>
+<ol>
+<li>Make your <tt>render_content()</tt> function empty (but it does need to exist to override the default one).</li>
+<li>Create a new function, <tt>content_template()</tt>, and put the old contents of <tt>render_content()</tt> there.</li>
+<li>Add any custom class variables that are needed for the control to be exported to the JavaScript in the browser&nbsp;(the JSON data)&nbsp;by modifying the&nbsp;<tt>to_json()</tt> function (see <tt><a href="https://developer.wordpress.org/reference/classes/wp_customize_color_control/">WP_Customize_Color_Control</a></tt> for an example).</li>
+<li>Convert the PHP from <tt>render_content()</tt> into a JS template, using <tt></tt> around JS statements to evaluate and&nbsp;<tt>{{ }}</tt> around variables to print. PHP class variables are available in the data object; for example, the label can be printed with <tt>{{ data.label }}</tt>.</li>
+<li><strong>Register the custom control class/type</strong>. This critical step tells the Customizer to print the template for this control. This is distinct from just printing templates for all controls that were added because the ideas are that many instances of this control type could be rendered from one template, and that any registered control types would be available for dynamic control-creation in the future. Just do something like <tt>$wp_customize-&gt;register_control_type( '<a href="https://developer.wordpress.org/reference/classes/wp_customize_color_control/">WP_Customize_Color_Control</a>' );</tt>.</li>
+</ol>
+<p>The PHP-only parts of the Customize API are still fully supported and perfectly fine to use. But&nbsp;given long term goals for making the customizer more flexible for doing things like switching themes in the customizer without a pageload, it is strongly encouraged to use&nbsp;JS/Underscore&nbsp;templates&nbsp;for all custom&nbsp;customizer objects where feasible.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+
+			
+		<nav class="handbook-navigation" role="navigation">
+			<h1 class="screen-reader-text">Handbook navigation</h1>
+			<div class="nav-links">
+
+			<a href="https://developer.wordpress.org/themes/customize-api/the-customizer-javascript-api/" rel="previous"><span class="meta-nav">←</span> The Customizer JavaScript API</a><a href="https://developer.wordpress.org/themes/customize-api/advanced-usage/" rel="next">Advanced Usage <span class="meta-nav">→</span></a>
+			</div>
+			<!-- .nav-links -->
+		</nav><!-- .navigation -->
+	
+		
+		</main>
+<main id="main" class="site-main post-25013 theme-handbook type-theme-handbook status-publish hentry type-handbook" role="main">
+
+		
+			
+<h1>Advanced Usage</h1>
+
+
+<p>The customize API is actively developed; this page contains additional more advanced topics. Additional discussion of advanced topics cab be found by searching the archives for the <a href="https://wordpress.slack.com/messages/core-customize/">#core-customize</a>&nbsp;channel in <a href="https://chat.wordpress.org/">Slack</a>.</p>
+<h2>Allow Non-administrators to Access the Customizer</h2>
+<p>Customizer access is controlled by the customize meta capability (mapped to edit_theme_options by default), which is assigned only to administrators by default. This allows for wider use of the Customizer’s extensive capability-access options, which are built into panels, sections, and settings. Additionally, this makes it possible to allow non-administrators to use the customizer for, for example, customizing posts. This change is an important step toward expanding the scope of the Customizer beyond themes.</p>
+<pre class="brush: php; title: ; notranslate" title="">function allow_users_who_can_edit_posts_to_customize( $caps, $cap, $user_id ) {
+  $required_cap = 'edit_posts';
+  if ( 'customize' === $cap &amp;&amp; user_can( $user_id, $required_cap ) ) {
+    $caps = array( $required_cap );
+  }
+  return $caps;
+}
+add_filter( 'map_meta_cap', 'allow_users_who_can_edit_posts_to_customize', 10, 3 );
+</pre>
+<p>Note that it is currently necessary to manually add links to the Customizer in the admin menu, admin bar, or elsewhere if you are granting the customize meta capability to non-administrator users.</p>
+
+
+<div class="bottom-of-entry">&nbsp;</div>
+		
+</main>
+
